@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
+
+@layer base {
+  * {
+    @apply border-glass-border;
+  }
+  html {
+    font-size: 15px;
+    background-color: #09090b;
+  }
+  body {
+    @apply text-primary font-body antialiased selection:bg-accent-purple/30 selection:text-white;
+    background-color: #09090b;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full hover:bg-white/20; }
+}
+
+@layer utilities {
+  .bento-card, .glass-panel {
+    @apply bg-glass border border-glass-border shadow-bento backdrop-blur-xl relative transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)];
+  }
+  
+  .bento-card.interactive:hover, .glass-panel.interactive:hover, .glass-panel:hover {
+    @apply bg-glass-hover border-white/10;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 32px -8px rgba(0,0,0,0.5);
+    transform: translateY(-2px);
+  }
+  .bento-card.interactive:active, .glass-panel.interactive:active, .glass-panel:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-orange;
+  }
+
+  .font-label-caps {
+    @apply font-mono font-bold tracking-[0.15em] uppercase text-[10px];
+  }
+  .font-body-md {
+    @apply font-sans font-medium leading-relaxed;
+  }
+  .font-body-lg {
+    @apply font-sans font-medium leading-relaxed text-[16px] md:text-[18px];
+  }
+
+  /* Backward Compatibility (Fallback) */
+  .neon-glow-primary, .glow-cyan, .glow-violet, .glow-rose, .glow-emerald, .glow-purple, .glow-orange, .text-gradient-violet, .neon-glow-secondary {
+    /* Muted these classes out to clean up the design */
+  }
+  
+  .animate-marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee 30s linear infinite;
+  }
+  .scan-line {
+      display: none;
+  }
+  .dot-grid {
+      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
