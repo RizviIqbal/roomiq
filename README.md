@@ -1,10 +1,10 @@
 # RoomiQ — Intelligent Shared Living Management Platform
 
 **Group Members:**
-- Fahmida Afrin (ID: [Student ID])
-- Sumit Ghosh (ID: [Student ID])
-- Rizvi Iqbal (ID: [Student ID])
-- Tawsif Kabir Pritom (ID: [Student ID])
+- Rizvi Iqbal (ID: 23201104)
+- Fahmida Afrin (ID: 23201306)
+- Sumit Ghosh (ID: 23201446)
+- Tawsif Kabir Pritom (ID: 23201231)
 
 ## Project Description
 
