@@ -22,8 +22,12 @@ app.use(express.json());
 // Routes
 app.use("/api/auth",        require("./routes/authRoutes"));
 app.use("/api/houses",      require("./routes/houseRoutes"));
+app.use("/api/matching",    require("./routes/matchingRoutes"));
 app.use("/api/expenses",    require("./routes/expenseRoutes"));
+app.use("/api/chores",      require("./routes/choreRoutes"));
+app.use("/api/rules",       require("./routes/ruleRoutes"));
 app.use("/api/maintenance", require("./routes/maintenanceRoutes"));
+app.use("/api/chat",        require("./routes/chatRoutes"));
 app.use("/api/upload",      require("./routes/uploadRoutes"));
 
 // Static files

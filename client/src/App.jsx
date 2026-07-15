@@ -11,6 +11,12 @@ import HouseSetupPage   from './pages/HouseSetupPage'
 import FinancePage      from './pages/FinancePage'
 import MaintenancePage  from './pages/MaintenancePage'
 import ProfilePage      from './pages/ProfilePage'
+import MatchingPage     from './pages/MatchingPage'
+import FindRoommatesPage from './pages/FindRoommatesPage'
+import ChatPage         from './pages/ChatPage'
+import InboxPage        from './pages/InboxPage'
+import RulesPage        from './pages/RulesPage'
+import ChoresPage       from './pages/ChoresPage'
 
 // Layout
 import AppShell from './components/layout/AppShell'
@@ -55,6 +61,12 @@ const AppRoutes = () => {
         <Route path="finance"      element={<FinancePage />} />
         <Route path="maintenance"  element={<MaintenancePage />} />
         <Route path="profile"      element={<ProfilePage />} />
+        <Route path="matching"     element={<MatchingPage />} />
+        <Route path="find-roommates" element={<FindRoommatesPage />} />
+        <Route path="chat/:userId" element={<ChatPage />} />
+        <Route path="inbox"        element={<InboxPage />} />
+        <Route path="rules"        element={<RulesPage />} />
+        <Route path="chores"       element={<ChoresPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/app/finance" replace />} />
