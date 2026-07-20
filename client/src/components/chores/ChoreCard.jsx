@@ -193,6 +193,23 @@ export default function ChoreCard({ chore, onRefresh, isAdmin }) {
               <p className="font-body text-[15px] text-primary-muted leading-relaxed">
                 Explain why <strong className="text-white font-semibold">{chore.title}</strong> wasn't done properly. This will notify {chore.assignedTo?.name} and flag it for review.
               </p>
+              
+              <div className="space-y-1.5">
+                <label className="font-label-caps text-[11px] uppercase tracking-wider text-primary-muted">Quick Reasons</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {['Not completed thoroughly', 'Trash bag not replaced', 'Dishes left in sink', 'Wrong date marked'].map(r => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setReason(r)}
+                      className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 text-primary-muted hover:text-white border border-glass-border text-[11px] transition-all"
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <textarea
                 value={reason}
                 onChange={e => setReason(e.target.value)}
