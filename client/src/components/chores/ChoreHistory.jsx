@@ -1,3 +1,4 @@
+// Chore Analytics & Statistics Component
 import { Avatar, ProgressBar, EmptyState } from '../ui'
 import { Trophy, AlertCircle } from 'lucide-react'
 
