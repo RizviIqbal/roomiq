@@ -86,3 +86,5 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
     </header>
   )
 }
+
+export default TopNavBar
