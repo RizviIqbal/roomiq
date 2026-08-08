@@ -197,7 +197,7 @@ export default function FindRoommatesPage() {
                       View Profile
                     </Button>
                     <Button 
-                      onClick={() => navigate(`/chat/${r._id}`)}
+                      onClick={() => navigate(`/app/chat/${r._id}`)}
                       className="flex-1 py-3 bg-white text-obsidian hover:bg-neutral-200 text-xs font-bold"
                     >
                       Message
@@ -266,7 +266,7 @@ export default function FindRoommatesPage() {
 
               <div>
                 <Button 
-                  onClick={() => navigate(`/chat/${selectedUser._id}`)}
+                  onClick={() => navigate(`/app/chat/${selectedUser._id}`)}
                   className="w-full flex items-center justify-center gap-2 py-4 shadow-xl"
                   size="lg"
                 >

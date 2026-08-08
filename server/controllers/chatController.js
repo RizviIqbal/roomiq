@@ -10,7 +10,7 @@ const getChatHistory = async (req, res) => {
     const myId = req.user._id;
 
     // Verify the other user exists
-    const otherUser = await User.findById(userId);
+    const otherUser = await User.findById(userId).select("name avatar email");
     if (!otherUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -28,7 +28,7 @@ const getChatHistory = async (req, res) => {
       { $set: { isRead: true } }
     );
 
-    res.status(200).json(messages);
+    res.status(200).json({ messages, otherUser });
   } catch (error) {
     console.error("Get Chat History Error:", error);
     res.status(500).json({ message: "Server error fetching chat history" });

@@ -1,20 +1,18 @@
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Bell, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { Avatar } from '../ui/index'
+import { User, LogOut } from 'lucide-react'
 
-export interface TopNavBarProps {
-  readonly className?: string;
+interface TopNavBarProps {
+  className?: string
 }
 
 export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
+  if (!user) {
+    return null
   }
 
   const navItems = [
@@ -24,7 +22,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
     { label: 'Issues', path: '/app/maintenance' },
     { label: 'Match', path: '/app/matching' },
     { label: 'Roommates', path: '/app/find-roommates' },
-    { label: 'Inbox', path: '/app/inbox' },
+    { label: 'Messages', path: '/app/messages' },
   ]
 
   return (
@@ -51,12 +49,12 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
           >
             {({ isActive }) => (
               <>
-                {item.label}
+                <span className="relative z-10">{item.label}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-white rounded-t-full shadow-[0_0_10px_rgba(255,255,255,1)]" />
+                  <span className="absolute bottom-1 left-5 right-5 h-[2px] bg-gradient-to-r from-accent-orange to-accent-rose shadow-[0_0_12px_rgba(255,107,0,0.8)] rounded-full animate-fade-in" />
                 )}
                 {!isActive && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white/20 rounded-t-full transition-all duration-300 group-hover:w-4" />
+                  <span className="absolute bottom-1 left-5 right-5 h-[1px] bg-white/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
                 )}
               </>
             )}
@@ -64,19 +62,27 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
         ))}
       </nav>
 
-      <div className="flex items-center gap-2 flex-shrink-0 mr-2">
-        <button onClick={() => navigate('/app/profile')} className="text-primary-muted hover:text-white p-2.5 transition-all rounded-full hover:bg-white/5 border border-transparent hover:border-glass-border">
-          <Settings size={18} strokeWidth={1.5} />
+      <div className="flex items-center gap-3 mr-2 flex-shrink-0">
+        <button
+          onClick={() => navigate('/app/profile')}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs transition-all duration-300"
+        >
+          {user.avatar ? (
+            <img src={user.avatar} alt={user.name} className="w-5 h-5 rounded-full object-cover" />
+          ) : (
+            <User size={14} className="text-accent-orange" />
+          )}
+          <span className="font-medium max-w-[100px] truncate hidden sm:inline">{user.name}</span>
         </button>
-        <button onClick={handleLogout} className="text-primary-muted hover:text-accent-rose p-2.5 transition-all rounded-full hover:bg-accent-rose/10 border border-transparent hover:border-accent-rose/20" title="Sign out">
-          <LogOut size={18} strokeWidth={1.5} />
+
+        <button
+          onClick={logout}
+          title="Sign Out"
+          className="p-2 rounded-full bg-white/5 hover:bg-accent-rose/20 hover:text-accent-rose text-primary-muted border border-white/10 text-xs transition-all duration-300"
+        >
+          <LogOut size={14} />
         </button>
-        <div className="ml-3 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/app/profile')}>
-           <Avatar name={user?.name || 'User'} size={36} src={user?.avatar} />
-        </div>
       </div>
     </header>
   )
 }
-
-export default TopNavBar

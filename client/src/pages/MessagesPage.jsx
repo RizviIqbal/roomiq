@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 
-export default function InboxPage() {
+export default function MessagesPage() {
   const navigate = useNavigate()
   const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -37,7 +37,7 @@ export default function InboxPage() {
   return (
     <PageTransition className="p-6 md:p-10 max-w-4xl mx-auto">
       <div className="mb-10">
-        <div className="font-label-caps text-[11px] uppercase tracking-[0.15em] text-accent-orange mb-2">[ INBOX ]</div>
+        <div className="font-label-caps text-[11px] uppercase tracking-[0.15em] text-accent-orange mb-2">[ MESSAGES ]</div>
         <h1 className="font-display text-[40px] font-bold tracking-tight text-white">Messages</h1>
         <p className="font-body text-[15px] text-primary-muted">Connect with prospective roommates or chat with your housemates.</p>
       </div>
@@ -52,15 +52,15 @@ export default function InboxPage() {
         <div className="flex flex-col gap-3">
           {conversations.map((conv) => {
             const { user, latestMessage, unreadCount } = conv;
-            const isMe = latestMessage.sender === user._id; // Wait, actually backend populates it
-            // Backend populates sender and receiver as objects
-            const isLatestFromMe = latestMessage.sender._id !== user._id;
+            const senderId = latestMessage?.sender?._id || latestMessage?.sender;
+            const userId = user?._id || user;
+            const isLatestFromMe = senderId && userId ? (senderId.toString() !== userId.toString()) : false;
 
             return (
               <motion.div 
                 variants={fadeSlideUp}
                 key={user._id} 
-                onClick={() => navigate(`/chat/${user._id}`)}
+                onClick={() => navigate(`/app/chat/${user._id}`)}
                 className="glass-panel border border-glass-border rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/5 hover:border-accent-orange/50 hover:shadow-glow transition-all"
               >
                 <div className="flex items-center gap-4 truncate">

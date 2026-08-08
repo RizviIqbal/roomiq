@@ -337,7 +337,7 @@ export default function HouseSetupPage() {
                 )}
                 
                 <Button 
-                  onClick={() => selectedHouse.adminId ? navigate(`/chat/${selectedHouse.adminId}`) : toast.error('No admin available')} 
+                  onClick={() => selectedHouse.adminId ? navigate(`/app/chat/${selectedHouse.adminId}`) : toast.error('No admin available')} 
                   size="lg" 
                   className="mt-2 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
                 >

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { SocketProvider } from './context/SocketContext'
 
@@ -14,7 +14,7 @@ import ProfilePage      from './pages/ProfilePage'
 import MatchingPage     from './pages/MatchingPage'
 import FindRoommatesPage from './pages/FindRoommatesPage'
 import ChatPage         from './pages/ChatPage'
-import InboxPage        from './pages/InboxPage'
+import MessagesPage     from './pages/MessagesPage'
 import RulesPage        from './pages/RulesPage'
 import ChoresPage       from './pages/ChoresPage'
 
@@ -41,9 +41,12 @@ const PageLoader = () => (
   </div>
 )
 
-const AppRoutes = () => {
-  const { user } = useAuth()
+const ChatRedirect = () => {
+  const { userId } = useParams()
+  return <Navigate to={`/app/chat/${userId}`} replace />
+}
 
+const AppRoutes = () => {
   return (
     <Routes>
       {/* Public */}
@@ -59,15 +62,26 @@ const AppRoutes = () => {
       <Route path="/app" element={<PrivateRoute><AppShell /></PrivateRoute>}>
         <Route index               element={<Navigate to="finance" replace />} />
         <Route path="finance"      element={<FinancePage />} />
+        <Route path="chores"       element={<ChoresPage />} />
+        <Route path="rules"        element={<RulesPage />} />
         <Route path="maintenance"  element={<MaintenancePage />} />
-        <Route path="profile"      element={<ProfilePage />} />
         <Route path="matching"     element={<MatchingPage />} />
         <Route path="find-roommates" element={<FindRoommatesPage />} />
         <Route path="chat/:userId" element={<ChatPage />} />
-        <Route path="inbox"        element={<InboxPage />} />
-        <Route path="rules"        element={<RulesPage />} />
-        <Route path="chores"       element={<ChoresPage />} />
+        <Route path="messages"     element={<MessagesPage />} />
+        <Route path="inbox"        element={<MessagesPage />} />
+        <Route path="profile"      element={<ProfilePage />} />
       </Route>
+
+      {/* Root-level redirects for convenience */}
+      <Route path="/messages" element={<Navigate to="/app/messages" replace />} />
+      <Route path="/inbox"    element={<Navigate to="/app/messages" replace />} />
+      <Route path="/finance"  element={<Navigate to="/app/finance" replace />} />
+      <Route path="/chores"   element={<Navigate to="/app/chores" replace />} />
+      <Route path="/rules"    element={<Navigate to="/app/rules" replace />} />
+      <Route path="/maintenance" element={<Navigate to="/app/maintenance" replace />} />
+      <Route path="/matching" element={<Navigate to="/app/matching" replace />} />
+      <Route path="/chat/:userId" element={<ChatRedirect />} />
 
       <Route path="*" element={<Navigate to="/app/finance" replace />} />
     </Routes>

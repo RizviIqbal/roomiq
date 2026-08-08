@@ -28,11 +28,13 @@ export default function ChatPage() {
     const loadChat = async () => {
       try {
         setLoading(true)
-        // 1. Fetch user details (Assuming matching API or similar exposes it, or we could fetch user directly. Let's use a generic endpoint or mock if not available, but we need the name).
-        // For simplicity, we just fetch chat history which shouldn't populate the other user by default unless modified, but let's assume we can at least get their name from messages or matching API.
-        // Wait, the chat controller doesn't populate the other user. Let's fetch the other user via matching API or we can just show "Chat".
         const { data } = await api.get(`/chat/${userId}`)
-        setMessages(data)
+        if (Array.isArray(data)) {
+          setMessages(data)
+        } else {
+          setMessages(data.messages || [])
+          setOtherUser(data.otherUser || null)
+        }
         
         // We join the chat room for ourselves via socket
         if (socket) socket.emit('join_chat', user._id)
@@ -90,12 +92,20 @@ export default function ChatPage() {
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-primary-muted hover:text-white transition-colors rounded-full hover:bg-white/10">
           <ChevronLeft size={24} />
         </button>
-        <div className="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-accent-purple border border-accent-purple/30 shadow-[0_0_15px_rgba(138,43,226,0.3)]">
-          <User size={20} />
-        </div>
+        {otherUser ? (
+          <Avatar name={otherUser.name} src={otherUser.avatar} size={40} className="border border-accent-purple/30 shadow-[0_0_15px_rgba(138,43,226,0.3)]" />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-accent-purple border border-accent-purple/30 shadow-[0_0_15px_rgba(138,43,226,0.3)]">
+            <User size={20} />
+          </div>
+        )}
         <div>
-          <h1 className="font-display font-medium text-[20px] text-white leading-none">Pre-Match Chat</h1>
-          <p className="font-mono text-[10px] tracking-[0.1em] text-accent-purple mt-1 uppercase">Encrypted Connection</p>
+          <h1 className="font-display font-medium text-[20px] text-white leading-none">
+            {otherUser ? otherUser.name : 'Pre-Match Chat'}
+          </h1>
+          <p className="font-mono text-[10px] tracking-[0.1em] text-accent-purple mt-1 uppercase">
+            {otherUser ? (otherUser.email || 'Encrypted Connection') : 'Encrypted Connection'}
+          </p>
         </div>
       </header>
 

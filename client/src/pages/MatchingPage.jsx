@@ -153,7 +153,7 @@ export default function MatchingPage() {
 
                       <div className="flex gap-2 items-center">
                         <button 
-                          onClick={(e) => { e.stopPropagation(); navigate(`/chat/${s.user._id}`); }}
+                          onClick={(e) => { e.stopPropagation(); navigate(`/app/chat/${s.user._id}`); }}
                           className="bg-accent-purple text-white hover:scale-105 active:scale-95 p-3 rounded-full border border-accent-purple/50 shadow-[0_0_15px_rgba(138,43,226,0.3)] transition-all"
                         >
                           <MessageCircle size={20} />
