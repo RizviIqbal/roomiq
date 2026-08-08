@@ -15,6 +15,12 @@ export default function ChoreHistory({ history }) {
   const totalOnTime = sorted.reduce((sum, s) => sum + (s.onTime || 0), 0)
   const avgOnTimeRate = totalCompleted > 0 ? Math.round((totalOnTime / totalCompleted) * 100) : 100
 
+  // Fairness balance: standard deviation of workload
+  const avgPerPerson = sorted.length > 0 ? totalCompleted / sorted.length : 0
+  const fairnessScore = sorted.length > 1
+    ? Math.max(0, Math.round(100 - (sorted.reduce((acc, s) => acc + Math.abs(s.completed - avgPerPerson), 0) / (totalCompleted || 1)) * 50))
+    : 100
+
   return (
     <div className="glass-panel rounded-[32px] p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-glass-border pb-4">
@@ -22,6 +28,7 @@ export default function ChoreHistory({ history }) {
           <Trophy size={14} className="text-accent-orange" /> Chore Analytics & Statistics
         </div>
         <div className="flex items-center gap-4 text-xs font-mono">
+          <span className="text-primary-muted">Fairness: <strong className="text-accent-cyan">{fairnessScore}% Balanced</strong></span>
           <span className="text-primary-muted">Total Done: <strong className="text-white">{totalCompleted}</strong></span>
           <span className="text-primary-muted">On-Time: <strong className="text-accent-emerald">{avgOnTimeRate}%</strong></span>
         </div>
