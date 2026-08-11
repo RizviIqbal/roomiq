@@ -11,10 +11,20 @@ export default function ChoreHistory({ history }) {
   const sorted = [...history].sort((a,b) => b.completed - a.completed)
   const maxCompleted = Math.max(...sorted.map(s => s.completed), 1)
 
+  const totalCompleted = sorted.reduce((sum, s) => sum + s.completed, 0)
+  const totalOnTime = sorted.reduce((sum, s) => sum + (s.onTime || 0), 0)
+  const avgOnTimeRate = totalCompleted > 0 ? Math.round((totalOnTime / totalCompleted) * 100) : 100
+
   return (
-    <div className="glass-panel rounded-[32px] p-8">
-      <div className="font-label-caps text-[11px] mb-6 flex items-center gap-2 text-primary-muted tracking-[0.15em] uppercase">
-        <Trophy size={14} className="text-accent-orange" /> Chore Analytics & Statistics
+    <div className="glass-panel rounded-[32px] p-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-glass-border pb-4">
+        <div className="font-label-caps text-[11px] flex items-center gap-2 text-primary-muted tracking-[0.15em] uppercase">
+          <Trophy size={14} className="text-accent-orange" /> Chore Analytics & Statistics
+        </div>
+        <div className="flex items-center gap-4 text-xs font-mono">
+          <span className="text-primary-muted">Total Done: <strong className="text-white">{totalCompleted}</strong></span>
+          <span className="text-primary-muted">On-Time: <strong className="text-accent-emerald">{avgOnTimeRate}%</strong></span>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -23,11 +33,24 @@ export default function ChoreHistory({ history }) {
           return (
             <div key={stat.user._id} className="group">
               <div className="flex items-center gap-4 mb-3">
-                <Avatar name={stat.user.name} size={36} src={stat.user.avatar} />
-                <div className="flex-1">
-                  <div className="font-body-md text-[16px] font-medium text-white group-hover:text-accent-orange transition-colors">
-                    {stat.user.name}
-                    {idx === 0 && <span className="ml-2 drop-shadow-md">🏆</span>}
+                <div className="relative">
+                  <Avatar name={stat.user.name} size={38} src={stat.user.avatar} />
+                  {idx === 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 text-xs bg-black/80 rounded-full p-0.5" title="Top Contributor">
+                      👑
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-body-md text-[16px] font-medium text-white group-hover:text-accent-orange transition-colors truncate">
+                      {stat.user.name}
+                    </span>
+                    {idx === 0 && (
+                      <span className="font-label-caps text-[9px] uppercase tracking-wider text-accent-emerald bg-accent-emerald/10 px-2 py-0.5 rounded-md border border-accent-emerald/20">
+                        Top Roomie
+                      </span>
+                    )}
                   </div>
                   <div className="font-label-caps text-[10px] tracking-[0.15em] text-primary-muted mt-0.5">
                     {stat.completed} completed · {onTimeRate}% on time

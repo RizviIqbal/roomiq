@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Badge, Avatar, Button } from '../ui'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
@@ -13,6 +14,7 @@ const STATUS_COLORS = { reported:'red', acknowledged:'yellow', in_progress:'acce
 const PRIORITY_COLORS = { low:'muted', medium:'accent', high:'yellow', urgent:'red' }
 
 export default function MaintenanceCard({ issue, onRefresh }) {
+  const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading]   = useState(false)
   const [note, setNote]         = useState('')
@@ -86,7 +88,7 @@ export default function MaintenanceCard({ issue, onRefresh }) {
               </div>
 
               {issue.statusHistory?.some(h => h.status === 'expense_created') && (
-                <div className="bg-accent-emerald/10 border border-accent-emerald/30 p-4 rounded-2xl flex items-center justify-between">
+                <div className="bg-accent-emerald/10 border border-accent-emerald/30 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-up">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">💳</span>
                     <div>
@@ -96,7 +98,15 @@ export default function MaintenanceCard({ issue, onRefresh }) {
                       </div>
                     </div>
                   </div>
-                  <Badge color="green">Expense Auto-Split</Badge>
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <Badge color="green">Auto-Split</Badge>
+                    <button 
+                      onClick={() => navigate('/app/finance')}
+                      className="text-xs text-accent-emerald hover:text-white font-medium flex items-center gap-1 bg-accent-emerald/20 hover:bg-accent-emerald/30 px-3 py-1.5 rounded-full transition-colors"
+                    >
+                      View in Finances <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
               )}
 
