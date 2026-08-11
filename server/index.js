@@ -28,6 +28,7 @@ app.use("/api/chores",      require("./routes/choreRoutes"));
 app.use("/api/rules",       require("./routes/ruleRoutes"));
 app.use("/api/maintenance", require("./routes/maintenanceRoutes"));
 app.use("/api/complaints",  require("./routes/complaintRoutes"));
+app.use("/api/shopping",    require("./routes/shoppingRoutes"));
 app.use("/api/chat",        require("./routes/chatRoutes"));
 app.use("/api/upload",      require("./routes/uploadRoutes"));
 

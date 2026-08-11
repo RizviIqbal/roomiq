@@ -21,6 +21,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
     { label: 'Rules', path: '/app/rules' },
     { label: 'Issues', path: '/app/maintenance' },
     { label: 'Complaints', path: '/app/complaints' },
+    { label: 'Shopping', path: '/app/shopping' },
     { label: 'Match', path: '/app/matching' },
     { label: 'Roommates', path: '/app/find-roommates' },
     { label: 'Messages', path: '/app/messages' },
