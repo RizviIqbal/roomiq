@@ -74,19 +74,11 @@ export default function DiscoverPage() {
   return (
     <div className="w-full px-4 md:px-[64px] pb-24 relative z-10">
       
-      {/* Hero Bento Card */}
-      <div className="bento-card rounded-3xl p-8 mb-8 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-accent-rose/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-accent-orange/10 transition-all duration-700" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="font-label-caps text-accent-rose mb-3">Discovery Feed</div>
-            <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1.1] tracking-tight mb-2">Public Houses<span className="text-accent-rose">.</span></h1>
-            <p className="font-body text-[16px] text-primary-muted max-w-xl">Browse other houses available on RoomiQ and see how compatible you are with their members.</p>
-          </div>
-          <div className="glass-panel px-6 py-4 rounded-2xl border border-glass-border flex flex-col items-end shrink-0">
-            <span className="font-mono text-[32px] font-bold text-white leading-none">{totalResults}</span>
-            <span className="font-label-caps text-[10px] text-primary-muted uppercase tracking-widest mt-1">Houses Found</span>
-          </div>
+      {/* Compact Stats Row */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[24px] font-bold text-white">{totalResults}</span>
+          <span className="font-label-caps text-primary-muted">Houses Found</span>
         </div>
       </div>
 

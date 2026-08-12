@@ -79,16 +79,6 @@ export default function MatchingPage() {
 
   return (
     <div className="w-full px-4 md:px-[64px] pb-24 relative z-10">
-      
-      {/* Hero Bento Card */}
-      <div className="bento-card rounded-3xl p-8 mb-8 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-accent-purple/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-accent-orange/10 transition-all duration-700" />
-        <div className="relative z-10">
-          <div className="font-label-caps text-accent-orange mb-3">Roommate Matching</div>
-          <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1.1] tracking-tight mb-2">Compatibility<span className="text-accent-orange">.</span></h1>
-          <p className="font-body text-[16px] text-primary-muted max-w-xl">Scores are calculated from 8 weighted lifestyle traits. Higher is better.</p>
-        </div>
-      </div>
 
       <div className="max-w-5xl mx-auto space-y-6">
         {/* House summary */}

@@ -39,17 +39,12 @@ export default function ComplaintsPage() {
 
   return (
     <div className="w-full px-6 md:px-[64px] pb-24">
-      {/* Header */}
-      <section className="mt-8 mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-        <div>
-          <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-primary-muted mb-2">Conflict Resolution</div>
-          <h1 className="font-display text-[56px] md:text-[80px] font-bold text-white leading-[1.1] tracking-tight">Complaints<span className="text-gradient">.</span></h1>
-          <p className="font-body-lg text-[18px] text-primary-muted max-w-xl mt-4">File concerns and resolve conflicts through community mediation.</p>
-        </div>
+      {/* Compact Action Bar */}
+      <div className="flex items-center justify-end mb-6">
         <Button variant="danger" onClick={() => setShowAdd(true)} className="flex items-center gap-2 shadow-[0_0_15px_rgba(225,29,72,0.3)]">
-          <Plus size={16} /> File complaint
+          <Plus size={16} /> Submit feedback
         </Button>
-      </section>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 max-w-6xl">
         {/* Incident log — 2/3 */}

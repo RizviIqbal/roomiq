@@ -35,12 +35,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <PageTransition className="p-6 md:p-10 max-w-4xl mx-auto">
-      <div className="mb-10">
-        <div className="font-label-caps text-[11px] uppercase tracking-[0.15em] text-accent-orange mb-2">[ MESSAGES ]</div>
-        <h1 className="font-display text-[40px] font-bold tracking-tight text-white">Messages</h1>
-        <p className="font-body text-[15px] text-primary-muted">Connect with prospective roommates or chat with your housemates.</p>
-      </div>
+    <PageTransition className="w-full px-6 md:px-[64px] pb-24">
 
       {conversations.length === 0 ? (
         <motion.div variants={fadeSlideUp} className="glass-panel rounded-3xl p-16 text-center border border-glass-border">

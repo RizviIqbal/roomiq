@@ -171,25 +171,13 @@ export default function ActivityPage() {
 
   return (
     <div className="w-full px-6 md:px-[64px] pb-24">
-      <section className="mt-8 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={16} className="text-accent-cyan" />
-            <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-accent-cyan">House Audit Log</div>
-          </div>
-          <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1.1] tracking-tight">Activity Feed<span className="text-accent-cyan">.</span></h1>
-          <p className="font-body text-[16px] md:text-[18px] text-primary-muted max-w-xl mt-4">
-            A real-time, complete timeline of everything happening in the house.
-          </p>
+      {/* Compact Stats Row */}
+      {stats.total > 0 && (
+        <div className="flex items-center gap-3 mb-6">
+          <span className="font-mono text-[24px] font-bold text-white">{stats.total}</span>
+          <span className="font-label-caps text-primary-muted">Total Activities</span>
         </div>
-        
-        {stats.total > 0 && (
-          <div className="glass-panel px-6 py-4 rounded-2xl border border-glass-border flex flex-col items-end">
-            <span className="font-mono text-[32px] font-bold text-white leading-none">{stats.total}</span>
-            <span className="font-label-caps text-[10px] text-primary-muted uppercase tracking-widest mt-1">Total Activities</span>
-          </div>
-        )}
-      </section>
+      )}
 
       {loading && !activities.length ? (
         <div className="flex justify-center py-20"><Spinner size={40} color="#06B6D4" /></div>

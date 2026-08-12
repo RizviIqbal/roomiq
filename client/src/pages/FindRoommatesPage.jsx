@@ -129,11 +129,6 @@ export default function FindRoommatesPage() {
       </div>
 
       <div className="flex-1">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-accent-orange mb-2">Algorithm Match</div>
-          <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1.1] tracking-tight">Find Roommates<span className="text-accent-orange">.</span></h1>
-        </div>
 
         {loading ? (
           <div className="flex justify-center py-20"><Spinner size={32} /></div>

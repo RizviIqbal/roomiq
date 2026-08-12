@@ -93,14 +93,6 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full px-6 md:px-[64px] pb-24">
-      {/* Header */}
-      <section className="mt-8 mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-        <div>
-          <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-primary-muted mb-2">Account Settings</div>
-          <h1 className="font-display text-[56px] md:text-[80px] font-bold text-white leading-[1.1] tracking-tight">Profile<span className="text-gradient">.</span></h1>
-          <p className="font-body-lg text-[18px] text-primary-muted max-w-xl mt-4">Manage your personal info, house settings, and preferences.</p>
-        </div>
-      </section>
 
       <div className="max-w-3xl space-y-8">
         {/* Profile header */}

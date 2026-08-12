@@ -46,17 +46,9 @@ export default function FinancePage() {
   return (
     <div className="w-full px-4 md:px-[64px] pb-24 relative z-10">
       
-      {/* Page Header as a Bento Hero */}
-      <div className="bento-card rounded-3xl p-8 mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 relative overflow-hidden group">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-accent-orange/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-accent-orange/20 transition-all duration-700" />
-        <div className="relative z-10">
-          <div className="font-label-caps text-accent-orange mb-3">Shared Ledger</div>
-          <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1.1] tracking-tight">Finance<span className="text-accent-orange">.</span></h1>
-          <p className="font-body text-[16px] text-primary-muted max-w-xl mt-2">
-            Track shared expenses, splits, and balances automatically.
-          </p>
-        </div>
-        <Button onClick={() => setShowAdd(true)} className="flex items-center gap-2 relative z-10">
+      {/* Compact Action Bar */}
+      <div className="flex items-center justify-end mb-6">
+        <Button onClick={() => setShowAdd(true)} className="flex items-center gap-2">
           <Plus size={16} /> Add expense
         </Button>
       </div>

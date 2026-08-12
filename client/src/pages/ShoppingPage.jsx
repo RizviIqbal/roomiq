@@ -29,14 +29,6 @@ export default function ShoppingPage() {
 
   return (
     <div className="w-full px-6 md:px-[64px] pb-24">
-      {/* Header */}
-      <section className="mt-8 mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-        <div>
-          <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-primary-muted mb-2">Household Supplies</div>
-          <h1 className="font-display text-[56px] md:text-[80px] font-bold text-white leading-[1.1] tracking-tight">Shopping<span className="text-gradient">.</span></h1>
-          <p className="font-body-lg text-[18px] text-primary-muted max-w-xl mt-4">Never double-buy communal supplies again. Track what's running low, and automatically split costs when you restock.</p>
-        </div>
-      </section>
 
       {loading ? (
         <div className="flex justify-center py-16">

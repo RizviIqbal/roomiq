@@ -83,31 +83,31 @@ export default function ChatPage() {
   )
 
   return (
-    <div className="flex flex-col h-screen bg-obsidian max-w-2xl mx-auto border-x border-glass-border shadow-2xl relative">
-      {/* Premium Aurora Glow behind the chat */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[500px] bg-accent-purple/10 rounded-[100%] blur-[120px] pointer-events-none" />
+    <div className="flex flex-col h-[calc(100vh-5rem)] max-w-3xl mx-auto relative px-4">
+      {/* Subtle Aurora Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[300px] bg-accent-purple/5 rounded-[100%] blur-[120px] pointer-events-none" />
 
-      {/* Header */}
-      <header className="flex items-center gap-4 p-6 border-b border-glass-border bg-glass backdrop-blur-xl z-10 sticky top-0">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-primary-muted hover:text-white transition-colors rounded-full hover:bg-white/10">
-          <ChevronLeft size={24} />
+      {/* Chat Peer Info Bar */}
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-glass-border bg-glass/50 backdrop-blur-sm rounded-t-2xl z-10">
+        <button onClick={() => navigate(-1)} className="p-1.5 -ml-1 text-primary-muted hover:text-white transition-colors rounded-full hover:bg-white/10">
+          <ChevronLeft size={20} />
         </button>
         {otherUser ? (
-          <Avatar name={otherUser.name} src={otherUser.avatar} size={40} className="border border-accent-purple/30 shadow-[0_0_15px_rgba(138,43,226,0.3)]" />
+          <Avatar name={otherUser.name} src={otherUser.avatar} size={36} className="border border-accent-purple/30" />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-accent-purple border border-accent-purple/30 shadow-[0_0_15px_rgba(138,43,226,0.3)]">
-            <User size={20} />
+          <div className="w-9 h-9 rounded-full bg-accent-purple/20 flex items-center justify-center text-accent-purple border border-accent-purple/30">
+            <User size={18} />
           </div>
         )}
         <div>
-          <h1 className="font-display font-medium text-[20px] text-white leading-none">
+          <h2 className="font-display font-medium text-[16px] text-white leading-none">
             {otherUser ? otherUser.name : 'Pre-Match Chat'}
-          </h1>
-          <p className="font-mono text-[10px] tracking-[0.1em] text-accent-purple mt-1 uppercase">
+          </h2>
+          <p className="font-mono text-[9px] tracking-[0.1em] text-accent-purple mt-0.5 uppercase">
             {otherUser ? (otherUser.email || 'Encrypted Connection') : 'Encrypted Connection'}
           </p>
         </div>
-      </header>
+      </div>
 
       {/* Messages View */}
       <main className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar z-10">

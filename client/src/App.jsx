@@ -23,6 +23,7 @@ import DiscoverPage     from './pages/DiscoverPage'
 import DashboardPage    from './pages/DashboardPage'
 import NoticeboardPage  from './pages/NoticeboardPage'
 import ActivityPage     from './pages/ActivityPage'
+import NotFoundPage    from './pages/NotFoundPage'
 
 // Layout
 import AppShell from './components/layout/AppShell'
@@ -37,13 +38,13 @@ const PrivateRoute = ({ children }) => {
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth()
   if (loading) return <PageLoader />
-  if (user) return <Navigate to="/app/finance" replace />
+  if (user) return <Navigate to="/app/dashboard" replace />
   return children
 }
 
 const PageLoader = () => (
-  <div className="flex items-center justify-center h-screen bg-canvas">
-    <div className="w-7 h-7 rounded-full border-2 border-neutral-200 border-t-neutral-950 animate-spin" />
+  <div className="flex items-center justify-center h-screen bg-obsidian">
+    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-accent-orange animate-spin" />
   </div>
 )
 
@@ -101,7 +102,7 @@ const AppRoutes = () => {
       <Route path="/matching" element={<Navigate to="/app/matching" replace />} />
       <Route path="/chat/:userId" element={<ChatRedirect />} />
 
-      <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

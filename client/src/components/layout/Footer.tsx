@@ -14,7 +14,7 @@ export const Footer: React.FC<FooterProps> = ({ className = '' }) => {
         <a className="font-label-caps text-[11px] uppercase tracking-[0.15em] text-primary-muted hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all" href="#">Contact</a>
       </div>
       <div className="font-label-caps text-[11px] uppercase tracking-[0.15em] text-primary-muted opacity-60">
-        © 2024 RoomIQ. All rights reserved.
+        © {new Date().getFullYear()} RoomIQ. All rights reserved.
       </div>
     </footer>
   )

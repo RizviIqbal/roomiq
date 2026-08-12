@@ -37,17 +37,12 @@ export default function RulesPage() {
 
   return (
     <div className="w-full px-6 md:px-[64px] pb-24">
-      {/* Header */}
-      <section className="mt-8 mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-        <div>
-          <div className="font-label-caps text-[12px] uppercase tracking-[0.15em] text-primary-muted mb-2">House Manifest</div>
-          <h1 className="font-display text-[56px] md:text-[80px] font-bold text-white leading-[1.1] tracking-tight">House Rules<span className="text-gradient">.</span></h1>
-          <p className="font-body-lg text-[18px] text-primary-muted max-w-xl mt-4">Propose, vote on, and track house rules democratically.</p>
-        </div>
+      {/* Compact Action Bar */}
+      <div className="flex items-center justify-end mb-6">
         <Button onClick={() => setShowAdd(true)} className="flex items-center gap-2">
           <Plus size={16} /> Propose rule
         </Button>
-      </section>
+      </div>
 
       {/* Tabs */}
       <div className="flex gap-3 mb-10 overflow-x-auto pb-2">
