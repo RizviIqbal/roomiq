@@ -27,14 +27,16 @@ const getHouseCompatibility = async (req, res) => {
 
 
 
-      results.push({
-        user: {
-          _id:    member.user._id,
-          name:   member.user.name,
-          avatar: member.user.avatar
-        },
-        ...result
-      });
+        results.push({
+          user: {
+            _id:                  member.user._id,
+            name:                 member.user.name,
+            avatar:               member.user.avatar,
+            occupation:           member.user.occupation,
+            compatibilityProfile: member.user.compatibilityProfile
+          },
+          ...result
+        });
     }
 
     // Sort by score descending
