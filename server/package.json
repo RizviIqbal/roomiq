@@ -7,8 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest --silent",
-    "seed": "node scripts/seed.js",
-    "seed:massive": "node massive-seed.js"
+    "seed": "node seed-all.js",
+    "seed:massive": "node seed-all.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
