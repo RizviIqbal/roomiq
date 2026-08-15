@@ -65,9 +65,15 @@ export default function LandingPage() {
             <a className="font-body text-primary-muted hover:text-accent-orange transition-colors duration-300" href="#how-it-works">How it Works</a>
             <a className="font-body text-primary-muted hover:text-accent-orange transition-colors duration-300" href="#testimonials">Testimonials</a>
           </div>
-          <div className="flex items-center gap-6">
-            <button onClick={() => navigate('/login')} className="font-body text-primary-muted hover:text-white transition-colors">Sign In</button>
-            <button onClick={() => navigate('/register')} className="bg-accent-purple text-white px-6 py-2.5 rounded-full font-bold hover:scale-105 active:scale-95 transition-transform shadow-glass">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/login')} 
+              className="px-4 py-2 rounded-full bg-accent-orange/10 hover:bg-accent-orange/20 text-accent-orange text-xs font-label-caps uppercase tracking-wider border border-accent-orange/30 transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <span>⚡</span> Demo Login
+            </button>
+            <button onClick={() => navigate('/login')} className="font-body text-primary-muted hover:text-white transition-colors text-sm">Sign In</button>
+            <button onClick={() => navigate('/register')} className="bg-accent-purple text-white px-5 py-2 rounded-full font-bold hover:scale-105 active:scale-95 transition-transform shadow-glass text-sm">
               Get Started
             </button>
           </div>
@@ -87,9 +93,12 @@ export default function LandingPage() {
             <p className="font-body text-lg md:text-xl text-primary-muted max-w-md">
               Say goodbye to awkward money conversations and chore disputes. Discover highly compatible homes, automate your chores, and instantly settle shared expenses.
             </p>
-            <div className="flex items-center gap-6 pt-4">
-              <button onClick={() => navigate('/register')} className="bg-accent-purple text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-glass">
-                Find Your House
+            <div className="flex flex-wrap items-center gap-4 pt-4">
+              <button onClick={() => navigate('/register')} className="bg-accent-purple text-white px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-all shadow-glass">
+                Find Your House →
+              </button>
+              <button onClick={() => navigate('/login')} className="bg-white/5 hover:bg-white/10 text-white border border-glass-border px-6 py-4 rounded-full font-bold text-base transition-all flex items-center gap-2">
+                <span>⚡</span> Explore Live Demo
               </button>
             </div>
           </div>
