@@ -16,12 +16,14 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
   }
 
   const navItems = [
+    { label: 'Dashboard', path: '/app/dashboard' },
     { label: 'Finances', path: '/app/finance' },
     { label: 'Chores', path: '/app/chores' },
     { label: 'Rules', path: '/app/rules' },
     { label: 'Issues', path: '/app/maintenance' },
     { label: 'Complaints', path: '/app/complaints' },
     { label: 'Shopping', path: '/app/shopping' },
+    { label: 'Notices', path: '/app/noticeboard' },
     { label: 'Discover', path: '/app/discover' },
     { label: 'Match', path: '/app/matching' },
     { label: 'Roommates', path: '/app/find-roommates' },
@@ -32,7 +34,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({ className = '' }) => {
     <header className={`fixed top-4 left-4 right-4 lg:left-8 lg:right-8 z-50 flex justify-between items-center px-4 py-2 bg-obsidian/60 backdrop-blur-3xl border border-glass-border shadow-glass rounded-full transition-all duration-500 transform-gpu ${className}`} style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
       <div 
         className="font-display text-[20px] font-bold tracking-tight text-white cursor-pointer hover:text-accent-orange transition-colors ml-4 flex-shrink-0"
-        onClick={() => navigate('/app/finance')}
+        onClick={() => navigate('/app/dashboard')}
       >
         RoomIQ<span className="text-accent-orange">.</span>
       </div>

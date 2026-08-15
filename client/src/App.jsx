@@ -20,6 +20,8 @@ import ChoresPage       from './pages/ChoresPage'
 import ComplaintsPage   from './pages/ComplaintsPage'
 import ShoppingPage     from './pages/ShoppingPage'
 import DiscoverPage     from './pages/DiscoverPage'
+import DashboardPage    from './pages/DashboardPage'
+import NoticeboardPage  from './pages/NoticeboardPage'
 
 // Layout
 import AppShell from './components/layout/AppShell'
@@ -63,13 +65,15 @@ const AppRoutes = () => {
       
       {/* App shell with sidebar */}
       <Route path="/app" element={<PrivateRoute><AppShell /></PrivateRoute>}>
-        <Route index               element={<Navigate to="finance" replace />} />
+        <Route index               element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard"    element={<DashboardPage />} />
         <Route path="finance"      element={<FinancePage />} />
         <Route path="chores"       element={<ChoresPage />} />
         <Route path="rules"        element={<RulesPage />} />
         <Route path="maintenance"  element={<MaintenancePage />} />
         <Route path="complaints"   element={<ComplaintsPage />} />
         <Route path="shopping"     element={<ShoppingPage />} />
+        <Route path="noticeboard"  element={<NoticeboardPage />} />
         <Route path="discover"     element={<DiscoverPage />} />
         <Route path="matching"     element={<MatchingPage />} />
         <Route path="find-roommates" element={<FindRoommatesPage />} />
@@ -80,6 +84,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* Root-level redirects for convenience */}
+      <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
       <Route path="/messages" element={<Navigate to="/app/messages" replace />} />
       <Route path="/inbox"    element={<Navigate to="/app/messages" replace />} />
       <Route path="/finance"  element={<Navigate to="/app/finance" replace />} />
@@ -88,11 +93,12 @@ const AppRoutes = () => {
       <Route path="/maintenance" element={<Navigate to="/app/maintenance" replace />} />
       <Route path="/complaints" element={<Navigate to="/app/complaints" replace />} />
       <Route path="/shopping" element={<Navigate to="/app/shopping" replace />} />
+      <Route path="/noticeboard" element={<Navigate to="/app/noticeboard" replace />} />
       <Route path="/discover" element={<Navigate to="/app/discover" replace />} />
       <Route path="/matching" element={<Navigate to="/app/matching" replace />} />
       <Route path="/chat/:userId" element={<ChatRedirect />} />
 
-      <Route path="*" element={<Navigate to="/app/finance" replace />} />
+      <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
     </Routes>
   )
 }
