@@ -212,7 +212,7 @@ export default function ProfilePage() {
   const quizDone = !!profile?.completedAt
 
   return (
-    <div className="w-full px-4 md:px-8 pb-24 max-w-7xl mx-auto">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24">
       
       {/* Symmetrical Two-Column Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

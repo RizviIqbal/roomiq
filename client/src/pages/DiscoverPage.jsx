@@ -72,7 +72,7 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="w-full px-4 md:px-[64px] pb-24 relative z-10">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 relative z-10">
       
       {/* Compact Stats Row */}
       <div className="flex items-center justify-between mb-6">

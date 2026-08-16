@@ -170,7 +170,7 @@ export default function ActivityPage() {
   )
 
   return (
-    <div className="w-full px-6 md:px-[64px] pb-24">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24">
       {/* Compact Stats Row */}
       {stats.total > 0 && (
         <div className="flex items-center gap-3 mb-6">

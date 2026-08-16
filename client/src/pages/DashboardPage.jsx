@@ -120,7 +120,7 @@ export default function DashboardPage() {
   const isMeAdmin = house?.members?.find(m => m.user?._id === user._id)?.role === 'admin'
 
   return (
-    <div className="w-full px-4 md:px-8 pb-24">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24">
       
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)] relative z-10">

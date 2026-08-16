@@ -58,7 +58,7 @@ export default function FindRoommatesPage() {
   }
 
   return (
-    <div className="w-full px-4 md:px-[64px] pb-24 relative z-10 flex flex-col md:flex-row gap-8">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 relative z-10 flex flex-col md:flex-row gap-8">
       
       {/* Mobile Filter Toggle */}
       <div className="md:hidden flex justify-end">

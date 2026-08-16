@@ -35,7 +35,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <PageTransition className="w-full px-6 md:px-[64px] pb-24">
+    <PageTransition className="w-full px-4 lg:px-8 xl:px-10 pb-24">
 
       {conversations.length === 0 ? (
         <motion.div variants={fadeSlideUp} className="glass-panel rounded-3xl p-16 text-center border border-glass-border">

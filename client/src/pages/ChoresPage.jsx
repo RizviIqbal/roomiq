@@ -108,7 +108,7 @@ export default function ChoresPage() {
   }, [chores, tab, searchQuery, filterType, user])
 
   return (
-    <div className="w-full px-4 md:px-8 pb-24 max-w-7xl mx-auto space-y-8">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-8">
       
       {/* ========================================================= */}
       {/* 1. CHORE OVERVIEW METRICS STRIP */}
