@@ -1,14 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSocketEvent } from '../context/SocketContext'
-import { Badge, Avatar, Button, Spinner, EmptyState } from '../components/ui'
+import { Badge, Avatar, Button, Spinner, EmptyState, ProgressBar } from '../components/ui'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import {
   DollarSign, CheckSquare, AlertTriangle, Wrench,
   ShoppingCart, Copy, Check, ArrowRight, Users, X, Shield, UserMinus,
-  Mail, Phone
+  Mail, Phone, Heart, Sparkles, Plus, Megaphone, Clock, ShieldCheck,
+  TrendingUp, TrendingDown, Wallet, Calendar, Zap, MessageCircle
 } from 'lucide-react'
 
 const currency = (amt, curr = 'BDT') =>
@@ -28,7 +29,7 @@ export default function DashboardPage() {
   const [copied,      setCopied]      = useState(false)
 
   const [selectedMember, setSelectedMember] = useState(null)
-  const [actionLoading, setActionLoading] = useState(false)
+  const [actionLoading, setActionLoading]   = useState(false)
 
   const houseId = user?.currentHouse?._id || user?.currentHouse
 
@@ -49,18 +50,19 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchDashboard() }, [fetchDashboard])
 
-  // Keep dashboard live as roommates make changes elsewhere
+  // Real-time socket sync
   const silentRefresh = useCallback(() => fetchDashboard(), [fetchDashboard])
-  useSocketEvent('expense_added',     silentRefresh)
-  useSocketEvent('expense_updated',   silentRefresh)
-  useSocketEvent('expense_deleted',   silentRefresh)
-  useSocketEvent('chore_updated',     silentRefresh)
-  useSocketEvent('inventory_updated', silentRefresh)
+  useSocketEvent('expense_added',       silentRefresh)
+  useSocketEvent('expense_updated',     silentRefresh)
+  useSocketEvent('expense_deleted',     silentRefresh)
+  useSocketEvent('chore_updated',       silentRefresh)
+  useSocketEvent('inventory_updated',   silentRefresh)
   useSocketEvent('maintenance_updated', silentRefresh)
 
   const copyCode = () => {
     navigator.clipboard.writeText(house?.inviteCode || '')
     setCopied(true)
+    toast.success('Invite code copied!')
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -105,7 +107,7 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-[80vh]">
-      <Spinner size={28} />
+      <Spinner size={32} color="#00E5FF" />
     </div>
   )
 
@@ -114,259 +116,431 @@ export default function DashboardPage() {
   )
 
   const myChores = chores.filter(c =>
-    c.assignedTo?._id === user._id || c.assignedTo === user._id
+    (c.assignedTo?._id === user._id || c.assignedTo === user._id) && c.status === 'pending'
   )
 
   const isMeAdmin = house?.members?.find(m => m.user?._id === user._id)?.role === 'admin'
 
+  // Summary Metrics
+  const totalNet = myBalance.reduce((acc, b) => {
+    if (b.creditor === user._id) return acc + b.amount
+    return acc - b.amount
+  }, 0)
+
   return (
-    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24">
+    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-6">
       
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)] relative z-10">
+      {/* ========================================================= */}
+      {/* 1. TOP HERO BENTO & QUICK ACTION HUB */}
+      {/* ========================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Hero Card - Spans 2 columns */}
-        <div className="bento-card rounded-3xl p-8 md:col-span-2 lg:col-span-2 row-span-1 flex flex-col justify-end relative overflow-hidden group animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-accent-orange/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-accent-orange/20 transition-all duration-700" />
-          <h1 className="font-display text-[48px] md:text-[64px] font-bold text-white leading-[1] tracking-tight relative z-10">{house?.name}</h1>
-          <p className="font-body text-[16px] text-primary-muted mt-2 relative z-10 max-w-sm">
-            {house?.address}
-          </p>
-        </div>
-
-        {/* Invite Code - Spans 1 column */}
-        <div 
-          onClick={copyCode}
-          className="bento-card interactive rounded-3xl p-8 md:col-span-1 lg:col-span-1 row-span-1 flex flex-col justify-center items-center text-center cursor-pointer group animate-fade-up !bg-accent-purple/5 !border-accent-purple/20 glow-violet" style={{ animationDelay: '0.2s' }}
-        >
-          <div className="font-label-caps text-primary-muted mb-4 group-hover:text-accent-orange transition-colors">Invite Code</div>
-          <div className="font-mono text-[24px] md:text-[32px] font-bold tracking-[0.2em] text-white group-hover:text-gradient transition-all flex items-center justify-center gap-3">
-            {house?.inviteCode}
-          </div>
-          <div className="mt-4 opacity-50 group-hover:opacity-100 transition-opacity text-primary-muted flex items-center gap-1 font-label-caps">
-            {copied ? <><Check size={12} className="text-accent-emerald" /> Copied</> : <><Copy size={12} /> Click to copy</>}
-          </div>
-        </div>
-
-        {/* Mini Stats Column - Spans 1 col */}
-        <div className="grid grid-rows-2 gap-4 md:col-span-3 lg:col-span-1 row-span-1 lg:row-span-2 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-          <div className="bento-card interactive rounded-3xl p-6 flex flex-col justify-between group !bg-accent-orange/5 !border-accent-orange/20 glow-cyan">
-            <div className="flex items-center gap-3 text-primary-muted group-hover:text-white transition-colors">
-              <Users size={16} />
-              <span className="font-label-caps">Members</span>
+        {/* House Overview Hero Card (8 cols) */}
+        <div className="lg:col-span-8 bento-card rounded-3xl p-8 lg:p-10 relative overflow-hidden flex flex-col justify-between group">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-accent-orange/10 rounded-full blur-[90px] pointer-events-none group-hover:bg-accent-orange/20 transition-all duration-700" />
+          
+          <div className="relative z-10 space-y-3">
+            <div className="flex items-center gap-2 font-label-caps text-xs text-accent-orange uppercase tracking-widest">
+              <Sparkles size={14} /> Shared House Dashboard
             </div>
-            <div className="font-display font-light text-[48px] text-white leading-none mt-4">{house?.members?.length ?? '—'}</div>
+            
+            <h1 className="font-display text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+              {house?.name}
+            </h1>
+            
+            <p className="font-body text-sm text-primary-muted max-w-xl leading-relaxed">
+              {house?.address || 'Your connected household'}
+            </p>
           </div>
-          <div className="bento-card interactive rounded-3xl p-6 flex flex-col justify-between group !bg-accent-rose/5 !border-accent-rose/20 glow-rose" onClick={() => navigate('/app/maintenance')}>
-            <div className="flex items-center gap-3 text-primary-muted group-hover:text-accent-rose transition-colors">
-              <Wrench size={16} />
-              <span className="font-label-caps">Issues</span>
-            </div>
-            <div className="font-display font-light text-[48px] text-white leading-none mt-4">{maintenance.length}</div>
-          </div>
-        </div>
 
-        {/* My Balance Card - Spans 2 cols, 2 rows */}
-        <div className="bento-card rounded-3xl p-8 md:col-span-2 lg:col-span-2 row-span-2 flex flex-col animate-fade-up !bg-accent-emerald/5 !border-accent-emerald/20 glow-emerald" style={{ animationDelay: '0.4s' }}>
-          <SectionHead title="My Balance" />
-          <div className="mt-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {myBalance.length === 0 ? (
-              <EmptyState icon="✅" title="All settled up" description="NO OUTSTANDING BALANCES" />
-            ) : (
-              <div className="space-y-2">
-                {myBalance.map((b, i) => {
-                  const iOwe = b.debtor === user._id
-                  const member = iOwe
-                    ? house?.members?.find(m => m.user?._id === b.creditor)
-                    : house?.members?.find(m => m.user?._id === b.debtor)
-                  const name = member?.user?.name || 'Deleted User'
-                  const bkashNumber = member?.user?.bkashNumber
-
-                  const handleBkash = () => {
-                    if (!bkashNumber) return;
-                    navigator.clipboard.writeText(bkashNumber);
-                    toast.success(`Copied ${bkashNumber}. Opening bKash...`, {
-                      icon: '📱', style: { background: '#e2136e', color: '#fff' }
-                    });
-                    setTimeout(() => { window.location.href = 'bkash://'; }, 500);
-                  }
-
-                  return (
-                    <div key={i} className="flex flex-col gap-2 py-4 px-5 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors border border-glass-border">
-                      <div className="flex items-center justify-between">
-                        <div className="font-body-md text-[16px] text-primary-muted">
-                          {iOwe ? <>You owe <span className="text-white font-semibold">{name}</span></> : <><span className="text-white font-semibold">{name}</span> owes you</>}
-                        </div>
-                        <div className={[
-                          'font-mono font-bold text-[18px]',
-                          iOwe ? 'text-accent-rose' : 'text-accent-emerald drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]',
-                        ].join(' ')}>
-                          {iOwe ? '−' : '+'}{currency(b.amount, house?.currency)}
-                        </div>
-                      </div>
-                      {iOwe && bkashNumber && (
-                        <div className="border-t border-glass-border pt-2 mt-1 animate-fade-up">
-                          <button 
-                            onClick={handleBkash} 
-                            className="w-full flex items-center justify-center gap-2 bg-[#e2136e] hover:bg-[#d00f63] text-white py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all shadow-sm active:scale-[0.98]"
-                          >
-                            Pay {currency(b.amount, house?.currency)} via bKash
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+          {/* Quick Action Buttons Row */}
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-white/5">
+            <button
+              onClick={() => navigate('/app/finance')}
+              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+            >
+              <DollarSign size={16} className="text-accent-emerald" />
+              <div>
+                <div className="text-xs font-bold text-white group-hover/btn:text-accent-emerald transition-colors">Add Expense</div>
+                <div className="text-[10px] text-primary-muted">Split shared bills</div>
               </div>
-            )}
+            </button>
+
+            <button
+              onClick={() => navigate('/app/chores')}
+              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+            >
+              <CheckSquare size={16} className="text-accent-cyan" />
+              <div>
+                <div className="text-xs font-bold text-white group-hover/btn:text-accent-cyan transition-colors">Chores</div>
+                <div className="text-[10px] text-primary-muted">{myChores.length} pending</div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigate('/app/noticeboard')}
+              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+            >
+              <Megaphone size={16} className="text-accent-orange" />
+              <div>
+                <div className="text-xs font-bold text-white group-hover/btn:text-accent-orange transition-colors">Noticeboard</div>
+                <div className="text-[10px] text-primary-muted">Post bulletin</div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigate('/app/matching')}
+              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+            >
+              <Heart size={16} className="text-accent-rose" />
+              <div>
+                <div className="text-xs font-bold text-white group-hover/btn:text-accent-rose transition-colors">Harmony</div>
+                <div className="text-[10px] text-primary-muted">Lifestyle match</div>
+              </div>
+            </button>
           </div>
         </div>
 
-        {/* My pending chores - Spans 1 cols, 2 rows */}
-        <div className="bento-card rounded-3xl p-8 md:col-span-1 lg:col-span-1 row-span-2 flex flex-col animate-fade-up !bg-accent-purple/5 !border-accent-purple/20 glow-purple" style={{ animationDelay: '0.5s' }}>
-          <SectionHead title="My Chores" count={myChores.length} onNav={() => navigate('/app/chores')} />
-          <div className="mt-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {myChores.length === 0 ? (
-              <EmptyState icon="🎉" title="No pending chores" description="YOU'RE ALL CLEAR" />
-            ) : (
-              <div className="space-y-3">
-                {myChores.slice(0,4).map(c => (
-                  <div key={c._id} className="py-4 border-b border-glass-border last:border-0 group cursor-pointer hover:pl-2 transition-all" onClick={() => navigate('/app/chores')}>
-                    <div className="font-display text-[18px] text-white group-hover:text-accent-orange transition-colors truncate">{c.title}</div>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="font-mono text-[10px] tracking-[0.15em] uppercase text-primary-muted">
-                        Due {new Date(c.dueDate).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}
+        {/* Invite Code & Quick House Stats Card (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col gap-4">
+          
+          {/* Invite Code Card */}
+          <div 
+            onClick={copyCode}
+            className="bento-card interactive rounded-3xl p-6 flex flex-col justify-center items-center text-center cursor-pointer group !bg-accent-purple/5 !border-accent-purple/20 relative overflow-hidden"
+          >
+            <div className="font-label-caps text-xs text-primary-muted uppercase tracking-widest mb-2 group-hover:text-accent-purple transition-colors">
+              House Invite Code
+            </div>
+            
+            <div className="font-mono text-3xl font-bold tracking-[0.2em] text-white group-hover:text-gradient transition-all flex items-center gap-2">
+              {house?.inviteCode}
+            </div>
+            
+            <div className="mt-3 text-xs text-primary-muted flex items-center gap-1 font-label-caps uppercase tracking-wider">
+              {copied ? (
+                <span className="text-accent-emerald flex items-center gap-1 font-bold">
+                  <Check size={13} /> Copied to Clipboard
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Copy size={13} /> Tap to Copy
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Numbers Dual Bento */}
+          <div className="grid grid-cols-2 gap-4 flex-1">
+            <div 
+              onClick={() => navigate('/app/profile')}
+              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-cyan/5 !border-accent-cyan/20 cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-primary-muted group-hover:text-white transition-colors">
+                <span className="font-label-caps text-[9px] uppercase tracking-wider">Members</span>
+                <Users size={15} />
+              </div>
+              <div className="font-display text-4xl font-bold text-white mt-3">
+                {house?.members?.length ?? '—'}
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate('/app/maintenance')}
+              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-rose/5 !border-accent-rose/20 cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-primary-muted group-hover:text-accent-rose transition-colors">
+                <span className="font-label-caps text-[9px] uppercase tracking-wider">Issues</span>
+                <Wrench size={15} />
+              </div>
+              <div className="font-display text-4xl font-bold text-white mt-3">
+                {maintenance.length}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ========================================================= */}
+      {/* 2. OPERATIONAL BENTO GRID (Ledger, Chores, Roommates, Expenses) */}
+      {/* ========================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* My Balance & Settlements (lg:col-span-6) */}
+        <div className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-emerald/[0.02] !border-accent-emerald/20">
+          <SectionHead 
+            title="My Net Balance" 
+            onNav={() => navigate('/app/finance')} 
+          />
+
+          {myBalance.length === 0 ? (
+            <div className="py-8 text-center">
+              <EmptyState icon="✅" title="All Settled Up" description="YOU HAVE NO OUTSTANDING DEBTS OR OWED BALANCES" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {myBalance.map((b, i) => {
+                const iOwe = b.debtor === user._id
+                const member = iOwe
+                  ? house?.members?.find(m => m.user?._id === b.creditor)
+                  : house?.members?.find(m => m.user?._id === b.debtor)
+                const name = member?.user?.name || 'Housemate'
+                const bkashNumber = member?.user?.bkashNumber
+
+                const handleBkash = () => {
+                  if (!bkashNumber) return;
+                  navigator.clipboard.writeText(bkashNumber);
+                  toast.success(`Copied ${bkashNumber}. Launching bKash...`, {
+                    icon: '📱', style: { background: '#e2136e', color: '#fff' }
+                  });
+                  setTimeout(() => { window.location.href = 'bkash://'; }, 500);
+                }
+
+                return (
+                  <div key={i} className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors border border-glass-border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-primary-muted">
+                        {iOwe ? (
+                          <>You owe <strong className="text-white">{name}</strong></>
+                        ) : (
+                          <><strong className="text-white">{name}</strong> owes you</>
+                        )}
                       </div>
-                      {new Date(c.dueDate) < new Date() && <div className="w-2 h-2 rounded-full bg-accent-rose animate-pulse" />}
+                      <div 
+                        className="font-mono font-bold text-base"
+                        style={{ color: iOwe ? '#F43F5E' : '#10B981' }}
+                      >
+                        {iOwe ? '−' : '+'}{currency(b.amount, house?.currency)}
+                      </div>
+                    </div>
+
+                    {iOwe && bkashNumber && (
+                      <div className="pt-2 border-t border-white/5">
+                        <button 
+                          onClick={handleBkash} 
+                          className="w-full flex items-center justify-center gap-2 bg-[#e2136e] hover:bg-[#d00f63] text-white py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all shadow-sm active:scale-[0.98]"
+                        >
+                          Pay {currency(b.amount, house?.currency)} via bKash
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* My Pending Chores (lg:col-span-6) */}
+        <div className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-purple/[0.02] !border-accent-purple/20">
+          <SectionHead 
+            title="My Assigned Chores" 
+            count={myChores.length} 
+            onNav={() => navigate('/app/chores')} 
+          />
+
+          {myChores.length === 0 ? (
+            <div className="py-8 text-center">
+              <EmptyState icon="🎉" title="No Pending Chores" description="YOU ARE ALL CLEAR ON DUTIES" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {myChores.slice(0, 4).map(c => {
+                const isOverdue = new Date(c.dueDate) < new Date()
+                return (
+                  <div 
+                    key={c._id} 
+                    onClick={() => navigate('/app/chores')}
+                    className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-glass-border flex items-center justify-between cursor-pointer transition-colors group"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-display font-medium text-sm text-white group-hover:text-accent-orange transition-colors truncate">
+                        {c.title}
+                      </div>
+                      <div className="font-mono text-[10px] text-primary-muted mt-1 uppercase">
+                        Due {new Date(c.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      </div>
+                    </div>
+                    
+                    {isOverdue && (
+                      <Badge color="red" className="text-[9px] uppercase tracking-wider shrink-0">
+                        Overdue
+                      </Badge>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Shared Expenses (lg:col-span-7) */}
+        <div className="lg:col-span-7 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
+          <SectionHead 
+            title="Recent Shared Expenses" 
+            onNav={() => navigate('/app/finance')} 
+          />
+
+          {expenses.length === 0 ? (
+            <div className="py-8 text-center">
+              <EmptyState icon="💸" title="No Expenses Yet" description="LOG YOUR FIRST SHARED HOUSE EXPENSE" />
+            </div>
+          ) : (
+            <div className="divide-y divide-glass-border">
+              {expenses.slice(0, 4).map(ex => (
+                <div 
+                  key={ex._id} 
+                  onClick={() => navigate('/app/finance')}
+                  className="py-3.5 flex items-center justify-between group cursor-pointer hover:bg-white/[0.02] px-2 rounded-xl transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="font-body text-sm font-medium text-white truncate group-hover:text-accent-orange transition-colors">
+                      {ex.title}
+                    </div>
+                    <div className="font-mono text-[10px] text-primary-muted mt-0.5 uppercase">
+                      Paid by {ex.paidBy?.name || 'Roommate'}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <div className="font-mono font-bold text-sm text-white shrink-0 ml-4">
+                    {currency(ex.totalAmount, house?.currency)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Members - Spans 1 col */}
-        <div className="bento-card rounded-3xl p-8 md:col-span-1 lg:col-span-1 row-span-2 flex flex-col animate-fade-up !bg-accent-orange/5 !border-accent-orange/20 glow-cyan" style={{ animationDelay: '0.6s' }}>
-          <SectionHead title="Roommates" count={house?.members?.length} />
-          <div className="space-y-2 mt-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+        {/* Roommates Directory (lg:col-span-5) */}
+        <div className="lg:col-span-5 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
+          <SectionHead 
+            title="Housemates" 
+            count={house?.members?.length} 
+          />
+
+          <div className="space-y-2">
             {house?.members?.map(m => (
               <div 
                 key={m.user?._id || Math.random()} 
                 onClick={() => m.user && setSelectedMember(m)}
-                className="flex items-center gap-4 group cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-all"
+                className="flex items-center gap-3.5 p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 cursor-pointer transition-all group"
               >
-                <Avatar name={m.user?.name} size={40} src={m.user?.avatar} />
+                <Avatar name={m.user?.name} size={38} src={m.user?.avatar} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-body text-[15px] text-white font-medium truncate group-hover:text-accent-orange transition-colors">{m.user?.name || 'Deleted User'}</div>
-                  {m.role === 'admin' && <div className="font-label-caps text-[8px] text-accent-orange mt-0.5 flex items-center gap-1"><Shield size={10} /> Admin</div>}
+                  <div className="font-body text-sm font-medium text-white truncate group-hover:text-accent-orange transition-colors">
+                    {m.user?.name || 'Housemate'}
+                  </div>
+                  <div className="text-[10px] text-primary-muted truncate">
+                    {m.user?.occupation || 'Roommate'}
+                  </div>
                 </div>
+                {m.role === 'admin' ? (
+                  <Badge color="accent" className="text-[9px] uppercase">
+                    Admin
+                  </Badge>
+                ) : (
+                  <Badge color="neutral" className="text-[9px] uppercase">
+                    Member
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Recent Expenses - Spans 2 cols */}
-        <div className="bento-card rounded-3xl p-8 md:col-span-2 lg:col-span-2 row-span-1 flex flex-col animate-fade-up !bg-accent-rose/5 !border-accent-rose/20 glow-rose" style={{ animationDelay: '0.7s' }}>
-          <SectionHead title="Recent Expenses" onNav={() => navigate('/app/finance')} />
-          <div className="mt-6">
-            {expenses.length === 0 ? (
-              <EmptyState icon="💸" title="No expenses yet" description="ADD YOUR FIRST SHARED EXPENSE" />
-            ) : (
-              <div className="space-y-1">
-                {expenses.slice(0,3).map(ex => (
-                  <div key={ex._id} className="flex items-center justify-between py-3 border-b border-glass-border last:border-0 group cursor-pointer hover:px-2 transition-all" onClick={() => navigate('/app/finance')}>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-body text-[16px] text-white truncate">{ex.title}</div>
-                      <div className="font-mono text-[10px] tracking-[0.1em] text-primary-muted mt-1 uppercase">
-                        {ex.paidBy?.name}
-                      </div>
-                    </div>
-                    <div className="font-mono font-medium text-[16px] text-white">
-                      {currency(ex.totalAmount, house?.currency)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Low Stock (Dynamic) - Spans 1 cols */}
-        {lowStock.length > 0 && (
-          <div className="bento-card interactive rounded-3xl p-6 md:col-span-1 lg:col-span-1 flex justify-between items-center bg-accent-orange/5 border-accent-orange/20 glow-orange cursor-pointer group animate-fade-up" style={{ animationDelay: '0.8s' }} onClick={() => navigate('/app/shopping')}>
-            <div>
-              <div className="font-label-caps text-accent-orange mb-1 group-hover:tracking-[0.2em] transition-all">Low Stock</div>
-              <div className="font-display text-[32px] text-white font-medium leading-none">{lowStock.length} Items</div>
-            </div>
-            <ArrowRight size={24} className="text-accent-orange opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-          </div>
-        )}
-
       </div>
 
-      {/* Member Profile Modal */}
+      {/* ========================================================= */}
+      {/* 3. MEMBER PROFILE MODAL */}
+      {/* ========================================================= */}
       {selectedMember && selectedMember.user && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedMember(null)}>
           <div 
-            className="bg-obsidian border border-glass-border rounded-3xl p-8 max-w-md w-full shadow-2xl relative animate-fade-up"
+            className="bg-obsidian border border-glass-border rounded-3xl p-8 max-w-md w-full shadow-2xl relative animate-fade-up space-y-6"
             onClick={e => e.stopPropagation()}
           >
             <button onClick={() => setSelectedMember(null)} className="absolute top-6 right-6 text-primary-muted hover:text-white transition-colors">
               <X size={20} />
             </button>
             
-            <div className="flex flex-col items-center text-center mb-6">
-              <Avatar name={selectedMember.user.name} size={80} src={selectedMember.user.avatar} />
-              <h2 className="font-display text-[28px] font-bold text-white mt-4 tracking-tight">{selectedMember.user.name}</h2>
-              {selectedMember.role === 'admin' && <div className="font-label-caps text-[10px] text-accent-orange mt-1 flex items-center gap-1"><Shield size={12} /> Admin</div>}
-              {selectedMember.user.occupation && (
-                <div className="font-label-caps text-[11px] text-accent-orange mt-2 tracking-[0.1em]">{selectedMember.user.occupation}</div>
-              )}
-              
-              <div className="text-primary-muted text-sm mt-2 flex items-center gap-2">
-                <Mail size={14} className="text-white/40" /> {selectedMember.user.email}
+            <div className="flex flex-col items-center text-center space-y-3">
+              <Avatar name={selectedMember.user.name} size={84} src={selectedMember.user.avatar} className="ring-2 ring-white/10" />
+              <div>
+                <h2 className="font-display text-2xl font-bold text-white tracking-tight">{selectedMember.user.name}</h2>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  {selectedMember.role === 'admin' && (
+                    <Badge color="accent" className="text-[9px] uppercase">
+                      <Shield size={10} className="mr-1" /> House Admin
+                    </Badge>
+                  )}
+                  {selectedMember.user.occupation && (
+                    <span className="font-label-caps text-[10px] text-accent-orange uppercase tracking-wider">
+                      {selectedMember.user.occupation}
+                    </span>
+                  )}
+                </div>
               </div>
-              {selectedMember.user.phone && (
-                <div className="text-primary-muted text-sm mt-1 flex items-center gap-2">
-                  <Phone size={14} className="text-white/40" /> {selectedMember.user.phone}
+
+              <div className="text-xs text-primary-muted space-y-1 pt-2 w-full text-left bg-white/5 p-4 rounded-2xl border border-white/5">
+                <div className="flex items-center gap-2 truncate">
+                  <Mail size={13} className="text-white/40 shrink-0" />
+                  <span className="truncate">{selectedMember.user.email}</span>
                 </div>
+                {selectedMember.user.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone size={13} className="text-white/40 shrink-0" />
+                    <span>{selectedMember.user.phone}</span>
+                  </div>
+                )}
+                {selectedMember.user.bio && (
+                  <p className="text-xs text-white/80 pt-2 border-t border-white/5 leading-relaxed">
+                    "{selectedMember.user.bio}"
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Actions (Chat / Admin Management) */}
+            <div className="space-y-2 pt-2 border-t border-glass-border">
+              {selectedMember.user._id !== user._id && (
+                <Button 
+                  fullWidth 
+                  size="sm"
+                  onClick={() => {
+                    setSelectedMember(null)
+                    navigate(`/app/chat/${selectedMember.user._id}`)
+                  }}
+                  className="bg-accent-purple text-white font-bold text-xs"
+                >
+                  <MessageCircle size={14} className="mr-1.5" /> Send Direct Message
+                </Button>
               )}
-              {selectedMember.joinedAt && (
-                <div className="font-label-caps text-[9px] text-primary-muted mt-3 uppercase tracking-[0.1em]">
-                  Joined {new Date(selectedMember.joinedAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
-                </div>
-              )}
-              
-              {selectedMember.user.bio && (
-                <div className="mt-4 p-4 bg-white/5 rounded-2xl text-sm text-white/80 border border-white/5 w-full">
-                  "{selectedMember.user.bio}"
+
+              {isMeAdmin && selectedMember.user._id !== user._id && (
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    loading={actionLoading}
+                    onClick={() => handleTransferAdmin(selectedMember.user._id)}
+                    className="text-[11px] !border-accent-orange/30 hover:!bg-accent-orange hover:!text-obsidian"
+                  >
+                    Transfer Admin
+                  </Button>
+                  <Button 
+                    variant="danger" 
+                    size="sm"
+                    loading={actionLoading}
+                    onClick={() => handleRemoveMember(selectedMember.user._id)}
+                    className="text-[11px]"
+                  >
+                    Remove Member
+                  </Button>
                 </div>
               )}
             </div>
 
-            {isMeAdmin && selectedMember.user._id !== user._id && (
-              <div className="border-t border-glass-border pt-6 mt-6 flex flex-col gap-3">
-                <div className="font-label-caps text-[10px] uppercase text-accent-rose mb-2 text-center">Admin Actions</div>
-                <Button 
-                  variant="secondary" 
-                  fullWidth 
-                  loading={actionLoading}
-                  onClick={() => handleTransferAdmin(selectedMember.user._id)}
-                  className="!border-accent-orange/30 hover:!bg-accent-orange hover:!text-obsidian"
-                >
-                  <Shield size={16} className="mr-2" /> Transfer Admin Role
-                </Button>
-                <Button 
-                  variant="danger" 
-                  fullWidth 
-                  loading={actionLoading}
-                  onClick={() => handleRemoveMember(selectedMember.user._id)}
-                >
-                  <UserMinus size={16} className="mr-2" /> Remove from House
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -375,9 +549,9 @@ export default function DashboardPage() {
 }
 
 const SectionHead = ({ title, count, onNav }) => (
-  <div className="flex items-center justify-between border-b border-glass-border pb-4 mb-2">
-    <div className="flex items-center gap-3">
-      <h2 className="font-display text-[22px] font-medium text-white">{title}</h2>
+  <div className="flex items-center justify-between border-b border-glass-border pb-3">
+    <div className="flex items-center gap-2.5">
+      <h2 className="font-display text-lg font-bold text-white">{title}</h2>
       {count != null && (
         <span className="font-mono text-[10px] text-white bg-white/10 rounded-full px-2 py-0.5 border border-white/20">
           {count}
@@ -385,8 +559,8 @@ const SectionHead = ({ title, count, onNav }) => (
       )}
     </div>
     {onNav && (
-      <button onClick={onNav} className="font-label-caps text-[9px] text-primary-muted hover:text-white transition-colors group flex items-center gap-1">
-        View <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+      <button onClick={onNav} className="font-label-caps text-[10px] text-primary-muted hover:text-white transition-colors flex items-center gap-1 group">
+        View All <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
       </button>
     )}
   </div>
