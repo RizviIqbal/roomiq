@@ -31,6 +31,7 @@ app.use("/api/complaints",  require("./routes/complaintRoutes"));
 app.use("/api/shopping",    require("./routes/shoppingRoutes"));
 app.use("/api/dashboard",   require("./routes/dashboardRoutes"));
 app.use("/api/noticeboard", require("./routes/noticeboardRoutes"));
+app.use("/api/activities",  require("./routes/activityRoutes"));
 app.use("/api/chat",        require("./routes/chatRoutes"));
 app.use("/api/upload",      require("./routes/uploadRoutes"));
 

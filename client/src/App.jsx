@@ -22,6 +22,7 @@ import ShoppingPage     from './pages/ShoppingPage'
 import DiscoverPage     from './pages/DiscoverPage'
 import DashboardPage    from './pages/DashboardPage'
 import NoticeboardPage  from './pages/NoticeboardPage'
+import ActivityPage     from './pages/ActivityPage'
 
 // Layout
 import AppShell from './components/layout/AppShell'
@@ -74,6 +75,7 @@ const AppRoutes = () => {
         <Route path="complaints"   element={<ComplaintsPage />} />
         <Route path="shopping"     element={<ShoppingPage />} />
         <Route path="noticeboard"  element={<NoticeboardPage />} />
+        <Route path="activity"     element={<ActivityPage />} />
         <Route path="discover"     element={<DiscoverPage />} />
         <Route path="matching"     element={<MatchingPage />} />
         <Route path="find-roommates" element={<FindRoommatesPage />} />
@@ -94,6 +96,7 @@ const AppRoutes = () => {
       <Route path="/complaints" element={<Navigate to="/app/complaints" replace />} />
       <Route path="/shopping" element={<Navigate to="/app/shopping" replace />} />
       <Route path="/noticeboard" element={<Navigate to="/app/noticeboard" replace />} />
+      <Route path="/activity" element={<Navigate to="/app/activity" replace />} />
       <Route path="/discover" element={<Navigate to="/app/discover" replace />} />
       <Route path="/matching" element={<Navigate to="/app/matching" replace />} />
       <Route path="/chat/:userId" element={<ChatRedirect />} />
