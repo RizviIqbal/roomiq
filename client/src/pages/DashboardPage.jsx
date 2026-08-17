@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSocketEvent } from '../context/SocketContext'
-import { Badge, Avatar, Button, Spinner, EmptyState, ProgressBar } from '../components/ui'
+import { Badge, Avatar, Button, Spinner, EmptyState, ProgressBar, PageTransition, AnimatedNumber, fadeSlideUp } from '../components/ui'
+import { motion } from 'framer-motion'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import {
@@ -128,7 +129,7 @@ export default function DashboardPage() {
   }, 0)
 
   return (
-    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-6">
+    <PageTransition className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-6">
       
       {/* ========================================================= */}
       {/* 1. TOP HERO BENTO & QUICK ACTION HUB */}
@@ -136,12 +137,12 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* House Overview Hero Card (8 cols) */}
-        <div className="lg:col-span-8 bento-card rounded-3xl p-8 lg:p-10 relative overflow-hidden flex flex-col justify-between group">
+        <motion.div variants={fadeSlideUp} className="lg:col-span-8 bento-card rounded-3xl p-8 lg:p-10 relative overflow-hidden flex flex-col justify-between group">
           <div className="absolute top-0 right-0 w-80 h-80 bg-accent-orange/10 rounded-full blur-[90px] pointer-events-none group-hover:bg-accent-orange/20 transition-all duration-700" />
           
           <div className="relative z-10 space-y-3">
             <div className="flex items-center gap-2 font-label-caps text-xs text-accent-orange uppercase tracking-widest">
-              <Sparkles size={14} /> Shared House Dashboard
+              <Sparkles size={14} className="animate-pulse" /> Shared House Dashboard
             </div>
             
             <h1 className="font-display text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
@@ -157,9 +158,9 @@ export default function DashboardPage() {
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-white/5">
             <button
               onClick={() => navigate('/app/finance')}
-              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+              className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.97] border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2 shadow-sm"
             >
-              <DollarSign size={16} className="text-accent-emerald" />
+              <DollarSign size={16} className="text-accent-emerald group-hover/btn:scale-110 transition-transform" />
               <div>
                 <div className="text-xs font-bold text-white group-hover/btn:text-accent-emerald transition-colors">Add Expense</div>
                 <div className="text-[10px] text-primary-muted">Split shared bills</div>
@@ -168,9 +169,9 @@ export default function DashboardPage() {
 
             <button
               onClick={() => navigate('/app/chores')}
-              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+              className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.97] border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2 shadow-sm"
             >
-              <CheckSquare size={16} className="text-accent-cyan" />
+              <CheckSquare size={16} className="text-accent-cyan group-hover/btn:scale-110 transition-transform" />
               <div>
                 <div className="text-xs font-bold text-white group-hover/btn:text-accent-cyan transition-colors">Chores</div>
                 <div className="text-[10px] text-primary-muted">{myChores.length} pending</div>
@@ -179,9 +180,9 @@ export default function DashboardPage() {
 
             <button
               onClick={() => navigate('/app/noticeboard')}
-              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+              className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.97] border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2 shadow-sm"
             >
-              <Megaphone size={16} className="text-accent-orange" />
+              <Megaphone size={16} className="text-accent-orange group-hover/btn:scale-110 transition-transform" />
               <div>
                 <div className="text-xs font-bold text-white group-hover/btn:text-accent-orange transition-colors">Noticeboard</div>
                 <div className="text-[10px] text-primary-muted">Post bulletin</div>
@@ -190,24 +191,25 @@ export default function DashboardPage() {
 
             <button
               onClick={() => navigate('/app/matching')}
-              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2"
+              className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.97] border border-white/5 text-left transition-all group/btn flex flex-col justify-between gap-2 shadow-sm"
             >
-              <Heart size={16} className="text-accent-rose" />
+              <Heart size={16} className="text-accent-rose group-hover/btn:scale-110 transition-transform" />
               <div>
                 <div className="text-xs font-bold text-white group-hover/btn:text-accent-rose transition-colors">Harmony</div>
                 <div className="text-[10px] text-primary-muted">Lifestyle match</div>
               </div>
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Invite Code & Quick House Stats Card (4 cols) */}
         <div className="lg:col-span-4 flex flex-col gap-4">
           
           {/* Invite Code Card */}
-          <div 
+          <motion.div 
+            variants={fadeSlideUp}
             onClick={copyCode}
-            className="bento-card interactive rounded-3xl p-6 flex flex-col justify-center items-center text-center cursor-pointer group !bg-accent-purple/5 !border-accent-purple/20 relative overflow-hidden"
+            className="bento-card interactive rounded-3xl p-6 flex flex-col justify-center items-center text-center cursor-pointer group !bg-accent-purple/5 !border-accent-purple/20 relative overflow-hidden active:scale-[0.98] transition-all"
           >
             <div className="font-label-caps text-xs text-primary-muted uppercase tracking-widest mb-2 group-hover:text-accent-purple transition-colors">
               House Invite Code
@@ -219,7 +221,7 @@ export default function DashboardPage() {
             
             <div className="mt-3 text-xs text-primary-muted flex items-center gap-1 font-label-caps uppercase tracking-wider">
               {copied ? (
-                <span className="text-accent-emerald flex items-center gap-1 font-bold">
+                <span className="text-accent-emerald flex items-center gap-1 font-bold animate-bounce">
                   <Check size={13} /> Copied to Clipboard
                 </span>
               ) : (
@@ -228,35 +230,37 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Quick Numbers Dual Bento */}
           <div className="grid grid-cols-2 gap-4 flex-1">
-            <div 
+            <motion.div 
+              variants={fadeSlideUp}
               onClick={() => navigate('/app/profile')}
-              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-cyan/5 !border-accent-cyan/20 cursor-pointer"
+              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-cyan/5 !border-accent-cyan/20 cursor-pointer active:scale-[0.97] transition-all"
             >
               <div className="flex items-center justify-between text-primary-muted group-hover:text-white transition-colors">
                 <span className="font-label-caps text-[9px] uppercase tracking-wider">Members</span>
                 <Users size={15} />
               </div>
               <div className="font-display text-4xl font-bold text-white mt-3">
-                {house?.members?.length ?? '—'}
+                <AnimatedNumber value={house?.members?.length || 0} />
               </div>
-            </div>
+            </motion.div>
 
-            <div 
+            <motion.div 
+              variants={fadeSlideUp}
               onClick={() => navigate('/app/maintenance')}
-              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-rose/5 !border-accent-rose/20 cursor-pointer"
+              className="bento-card interactive rounded-3xl p-5 flex flex-col justify-between group !bg-accent-rose/5 !border-accent-rose/20 cursor-pointer active:scale-[0.97] transition-all"
             >
               <div className="flex items-center justify-between text-primary-muted group-hover:text-accent-rose transition-colors">
                 <span className="font-label-caps text-[9px] uppercase tracking-wider">Issues</span>
                 <Wrench size={15} />
               </div>
               <div className="font-display text-4xl font-bold text-white mt-3">
-                {maintenance.length}
+                <AnimatedNumber value={maintenance.length} />
               </div>
-            </div>
+            </motion.div>
           </div>
 
         </div>
@@ -269,7 +273,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-start">
         
         {/* My Balance & Settlements (lg:col-span-6) */}
-        <div className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-emerald/[0.02] !border-accent-emerald/20">
+        <motion.div variants={fadeSlideUp} className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-emerald/[0.02] !border-accent-emerald/20">
           <SectionHead 
             title="My Net Balance" 
             onNav={() => navigate('/app/finance')} 
@@ -320,7 +324,7 @@ export default function DashboardPage() {
                       <div className="pt-2 border-t border-white/5">
                         <button 
                           onClick={handleBkash} 
-                          className="w-full flex items-center justify-center gap-2 bg-[#e2136e] hover:bg-[#d00f63] text-white py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all shadow-sm active:scale-[0.98]"
+                          className="w-full flex items-center justify-center gap-2 bg-[#e2136e] hover:bg-[#d00f63] active:scale-[0.98] text-white py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all shadow-sm"
                         >
                           Pay {currency(b.amount, house?.currency)} via bKash
                         </button>
@@ -331,10 +335,10 @@ export default function DashboardPage() {
               })}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* My Pending Chores (lg:col-span-6) */}
-        <div className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-purple/[0.02] !border-accent-purple/20">
+        <motion.div variants={fadeSlideUp} className="lg:col-span-6 bento-card rounded-3xl p-6 lg:p-8 space-y-6 !bg-accent-purple/[0.02] !border-accent-purple/20">
           <SectionHead 
             title="My Assigned Chores" 
             count={myChores.length} 
@@ -353,7 +357,7 @@ export default function DashboardPage() {
                   <div 
                     key={c._id} 
                     onClick={() => navigate('/app/chores')}
-                    className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-glass-border flex items-center justify-between cursor-pointer transition-colors group"
+                    className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.98] border border-glass-border flex items-center justify-between cursor-pointer transition-colors group"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="font-display font-medium text-sm text-white group-hover:text-accent-orange transition-colors truncate">
@@ -365,7 +369,7 @@ export default function DashboardPage() {
                     </div>
                     
                     {isOverdue && (
-                      <Badge color="red" className="text-[9px] uppercase tracking-wider shrink-0">
+                      <Badge color="red" className="text-[9px] uppercase tracking-wider shrink-0 animate-pulse">
                         Overdue
                       </Badge>
                     )}
@@ -374,10 +378,10 @@ export default function DashboardPage() {
               })}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Recent Shared Expenses (lg:col-span-7) */}
-        <div className="lg:col-span-7 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
+        <motion.div variants={fadeSlideUp} className="lg:col-span-7 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
           <SectionHead 
             title="Recent Shared Expenses" 
             onNav={() => navigate('/app/finance')} 
@@ -393,7 +397,7 @@ export default function DashboardPage() {
                 <div 
                   key={ex._id} 
                   onClick={() => navigate('/app/finance')}
-                  className="py-3.5 flex items-center justify-between group cursor-pointer hover:bg-white/[0.02] px-2 rounded-xl transition-colors"
+                  className="py-3.5 flex items-center justify-between group cursor-pointer hover:bg-white/[0.02] active:scale-[0.99] px-2 rounded-xl transition-all"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="font-body text-sm font-medium text-white truncate group-hover:text-accent-orange transition-colors">
@@ -410,10 +414,10 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Roommates Directory (lg:col-span-5) */}
-        <div className="lg:col-span-5 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
+        <motion.div variants={fadeSlideUp} className="lg:col-span-5 bento-card rounded-3xl p-6 lg:p-8 space-y-6">
           <SectionHead 
             title="Housemates" 
             count={house?.members?.length} 
@@ -424,7 +428,7 @@ export default function DashboardPage() {
               <div 
                 key={m.user?._id || Math.random()} 
                 onClick={() => m.user && setSelectedMember(m)}
-                className="flex items-center gap-3.5 p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 cursor-pointer transition-all group"
+                className="flex items-center gap-3.5 p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.98] border border-white/5 cursor-pointer transition-all group"
               >
                 <Avatar name={m.user?.name} size={38} src={m.user?.avatar} />
                 <div className="flex-1 min-w-0">
@@ -447,7 +451,7 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
       </div>
 
@@ -544,7 +548,7 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   )
 }
 

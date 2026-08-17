@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useFinance } from '../hooks/useFinance'
 import { useSocketEvent } from '../context/SocketContext'
-import { Button, Spinner, EmptyState, ProgressBar, Badge } from '../components/ui'
+import { Button, Spinner, EmptyState, ProgressBar, Badge, PageTransition, AnimatedNumber, fadeSlideUp } from '../components/ui'
+import { motion } from 'framer-motion'
 import AddExpenseModal from '../components/finance/AddExpenseModal'
 import ExpenseCard from '../components/finance/ExpenseCard'
 import BalanceSummary from '../components/finance/BalanceSummary'
@@ -118,7 +119,7 @@ export default function FinancePage() {
   )
 
   return (
-    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-8">
+    <PageTransition className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-8">
       
       {/* ========================================================= */}
       {/* 1. FINANCIAL SUMMARY METRIC CARDS */}
@@ -126,35 +127,37 @@ export default function FinancePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total House Spend */}
-        <div className="bento-card rounded-3xl p-6 relative overflow-hidden group">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-6 relative overflow-hidden group">
           <div className="flex items-center justify-between text-primary-muted mb-3">
             <span className="font-label-caps text-[10px] uppercase tracking-widest">Total House Spend</span>
             <DollarSign size={16} className="text-accent-orange" />
           </div>
-          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight">
-            {curr}{financialStats.totalSpend.toLocaleString()}
+          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight flex items-baseline gap-1">
+            <span>{curr}</span>
+            <AnimatedNumber value={financialStats.totalSpend} />
           </div>
           <div className="text-xs text-primary-muted mt-2">
             Across {expenses.length} logged expenses
           </div>
-        </div>
+        </motion.div>
 
         {/* My Total Share */}
-        <div className="bento-card rounded-3xl p-6 relative overflow-hidden group">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-6 relative overflow-hidden group">
           <div className="flex items-center justify-between text-primary-muted mb-3">
             <span className="font-label-caps text-[10px] uppercase tracking-widest">My Assigned Share</span>
             <Wallet size={16} className="text-accent-cyan" />
           </div>
-          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight">
-            {curr}{financialStats.myTotalShare.toLocaleString()}
+          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight flex items-baseline gap-1">
+            <span>{curr}</span>
+            <AnimatedNumber value={financialStats.myTotalShare} />
           </div>
           <div className="text-xs text-primary-muted mt-2">
             Your portion of shared expenses
           </div>
-        </div>
+        </motion.div>
 
         {/* Net Debt Position */}
-        <div className="bento-card rounded-3xl p-6 relative overflow-hidden group">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-6 relative overflow-hidden group">
           <div className="flex items-center justify-between text-primary-muted mb-3">
             <span className="font-label-caps text-[10px] uppercase tracking-widest">Net Balance Position</span>
             {financialStats.netPosition >= 0 ? (
@@ -164,31 +167,33 @@ export default function FinancePage() {
             )}
           </div>
           <div 
-            className="font-display text-3xl md:text-4xl font-bold tracking-tight"
+            className="font-display text-3xl md:text-4xl font-bold tracking-tight flex items-baseline gap-1"
             style={{ color: financialStats.netPosition >= 0 ? '#10B981' : '#F43F5E' }}
           >
-            {financialStats.netPosition >= 0 ? '+' : '−'}{curr}{Math.abs(financialStats.netPosition).toLocaleString()}
+            <span>{financialStats.netPosition >= 0 ? '+' : '−'}{curr}</span>
+            <AnimatedNumber value={Math.abs(financialStats.netPosition)} />
           </div>
           <div className="text-xs text-primary-muted mt-2">
             {financialStats.netPosition > 0 && `You are owed ${curr}${financialStats.netPosition.toLocaleString()} overall`}
             {financialStats.netPosition < 0 && `You owe ${curr}${Math.abs(financialStats.netPosition).toLocaleString()} overall`}
             {financialStats.netPosition === 0 && 'All debts settled!'}
           </div>
-        </div>
+        </motion.div>
 
         {/* Recurring Bills */}
-        <div className="bento-card rounded-3xl p-6 relative overflow-hidden group">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-6 relative overflow-hidden group">
           <div className="flex items-center justify-between text-primary-muted mb-3">
             <span className="font-label-caps text-[10px] uppercase tracking-widest">Scheduled Bills</span>
             <Repeat size={16} className="text-accent-purple" />
           </div>
-          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight">
-            {financialStats.recurringCount} Active
+          <div className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight flex items-baseline gap-2">
+            <AnimatedNumber value={financialStats.recurringCount} />
+            <span className="text-base text-primary-muted font-normal">Active</span>
           </div>
           <div className="text-xs text-primary-muted mt-2">
             Auto-recurring monthly splits
           </div>
-        </div>
+        </motion.div>
 
       </div>
 
@@ -196,7 +201,7 @@ export default function FinancePage() {
       {/* 2. CATEGORY SPEND DISTRIBUTION BAR */}
       {/* ========================================================= */}
       {financialStats.totalSpend > 0 && (
-        <div className="bento-card rounded-3xl p-6 space-y-4">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-label-caps text-[10px] uppercase tracking-widest text-primary-muted flex items-center gap-1.5">
               <PieChart size={13} className="text-accent-orange" /> Expense Distribution by Category
@@ -235,7 +240,7 @@ export default function FinancePage() {
               )
             })}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ========================================================= */}
@@ -394,7 +399,7 @@ export default function FinancePage() {
           onAdded={() => refresh()}
         />
       )}
-    </div>
+    </PageTransition>
   )
 }
 

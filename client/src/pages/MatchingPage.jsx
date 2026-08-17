@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Badge, Avatar, Button, Spinner, ProgressBar, EmptyState } from '../components/ui'
+import { Badge, Avatar, Button, Spinner, ProgressBar, EmptyState, PageTransition, AnimatedNumber, fadeSlideUp } from '../components/ui'
+import { motion, AnimatePresence } from 'framer-motion'
 import api from '../services/api'
 import { 
   Heart, ChevronDown, ChevronUp, Users, AlertCircle, MessageCircle, 
@@ -196,13 +197,13 @@ export default function MatchingPage() {
   )
 
   return (
-    <div className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-8">
+    <PageTransition className="w-full px-4 lg:px-8 xl:px-10 pb-24 space-y-8">
       
       {/* ========================================================= */}
       {/* 1. HOUSE HARMONY HEALTH HERO BENTO */}
       {/* ========================================================= */}
       {summary?.overallScore != null && (
-        <div className="bento-card rounded-3xl p-8 lg:p-10 relative overflow-hidden group">
+        <motion.div variants={fadeSlideUp} className="bento-card rounded-3xl p-8 lg:p-10 relative overflow-hidden group">
           <div 
             className="absolute top-0 left-0 right-0 h-1.5" 
             style={{ backgroundColor: scoreColor(summary.overallScore) }} 
@@ -219,7 +220,7 @@ export default function MatchingPage() {
               
               <div className="flex items-baseline gap-3">
                 <div className="font-display text-[72px] lg:text-[92px] font-bold tracking-tight leading-none text-white drop-shadow-md">
-                  {summary.overallScore}
+                  <AnimatedNumber value={summary.overallScore} />
                 </div>
                 <div className="font-display text-2xl lg:text-3xl text-primary-muted font-medium">/ 100</div>
               </div>
@@ -290,7 +291,7 @@ export default function MatchingPage() {
             </div>
 
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ========================================================= */}
@@ -596,6 +597,6 @@ export default function MatchingPage() {
         </div>
       )}
 
-    </div>
+    </PageTransition>
   )
 }
