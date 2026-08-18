@@ -3,12 +3,12 @@ import { Button, Input, Select, Avatar } from '../ui'
 import { Overlay, ModalHeader } from '../finance/AddExpenseModal'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { Plus, ArrowUp, ArrowDown } from 'lucide-react'
+import { Plus, ArrowUp, ArrowDown, Check, Calendar, RotateCw, UserCheck } from 'lucide-react'
 
 const FREQUENCIES = [
   { value: 'daily',    label: 'Daily' },
   { value: 'weekly',   label: 'Weekly' },
-  { value: 'biweekly', label: 'Every 2 weeks' },
+  { value: 'biweekly', label: 'Every 2 Weeks' },
   { value: 'monthly',  label: 'Monthly' },
 ]
 
@@ -17,7 +17,7 @@ export default function AddChoreModal({ houseId, members, onClose, onAdded }) {
     title:             '',
     description:       '',
     assignedTo:        members?.[0]?.user?._id || '',
-    dueDate:           '',
+    dueDate:           new Date(Date.now() + 86400000).toISOString().split('T')[0],
     isAutoRotate:      false,
     rotationFrequency: 'weekly',
   })
@@ -59,7 +59,7 @@ export default function AddChoreModal({ houseId, members, onClose, onAdded }) {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim()) e.title   = 'Title is required'
+    if (!form.title.trim()) e.title   = 'Chore title is required'
     if (!form.dueDate)      e.dueDate = 'Due date is required'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -71,16 +71,16 @@ export default function AddChoreModal({ houseId, members, onClose, onAdded }) {
     try {
       const payload = {
         houseId,
-        title:       form.title,
-        description: form.description,
-        dueDate:     form.dueDate,
-        isAutoRotate: form.isAutoRotate,
+        title:             form.title.trim(),
+        description:       form.description.trim(),
+        dueDate:           form.dueDate,
+        isAutoRotate:      form.isAutoRotate,
         rotationFrequency: form.rotationFrequency,
-        assignedTo:  form.isAutoRotate ? rotationOrder[0] : form.assignedTo,
-        rotationOrder: form.isAutoRotate ? rotationOrder : [form.assignedTo],
+        assignedTo:        form.isAutoRotate ? rotationOrder[0] : form.assignedTo,
+        rotationOrder:     form.isAutoRotate ? rotationOrder : [form.assignedTo],
       }
       const { data } = await api.post('/chores', payload)
-      toast.success('Chore created')
+      toast.success('🎉 Chore scheduled on house roster')
       onAdded(data)
       onClose()
     } catch (err) {
@@ -92,84 +92,160 @@ export default function AddChoreModal({ houseId, members, onClose, onAdded }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-full max-w-lg glass-panel p-0 overflow-hidden border border-glass-border shadow-glow rounded-3xl">
-        <ModalHeader title="Create chore" onClose={onClose} />
+      <div className="bento-card bg-obsidian/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] rounded-3xl overflow-hidden relative">
+        
+        {/* Top Accent Strip */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-purple via-fuchsia-500 to-accent-orange" />
 
-        <div className="flex flex-col gap-6 px-8 pb-8 pt-4">
+        <ModalHeader 
+          icon="🧹" 
+          title="Create House Chore" 
+          subtitle="Assign cleaning & maintenance tasks"
+          onClose={onClose} 
+        />
+
+        <div className="p-6 sm:p-8 space-y-5">
+          
+          {/* Title */}
           <Input
-            label="Chore title"
-            placeholder='e.g. "Clean the bathroom"'
+            label="Chore Title *"
+            placeholder='e.g. "Clean kitchen sink & counters", "Take out trash"'
             value={form.title}
             onChange={set('title')}
             error={errors.title}
+            className="bg-white/5 border-glass-border text-white text-sm"
           />
 
-          <div>
-            <div className="font-label-caps text-[11px] mb-2 tracking-[0.15em] text-primary-muted pl-1">Description (optional)</div>
+          {/* Description */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-primary-muted font-medium block">Instructions (Optional)</label>
             <textarea
               value={form.description}
               onChange={set('description')}
-              placeholder="Any specific instructions..."
+              placeholder="e.g. Please run the dishwasher before 10 PM and replace bin liner..."
               rows={2}
-              className="w-full px-4 py-3 bg-white/5 border border-glass-border rounded-xl text-[15px] text-white resize-y outline-none focus:border-accent-orange focus:bg-white/10 placeholder:text-white/20"
+              className="w-full bg-white/5 border border-glass-border rounded-2xl p-3 text-xs text-white placeholder-primary-muted/40 focus:outline-none focus:border-accent-purple transition-all resize-none"
             />
           </div>
 
-          <Input
-            label="Due date"
-            type="date"
-            value={form.dueDate}
-            onChange={set('dueDate')}
-            error={errors.dueDate}
-            min={new Date().toISOString().split('T')[0]}
-            className="w-full"
-          />
-
-          {/* Auto-rotate toggle */}
-          <div className="flex items-center gap-4 px-5 py-4 bg-white/5 border border-glass-border rounded-xl">
+          {/* Due Date */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-primary-muted font-medium block">Due Date *</label>
             <input
-              type="checkbox"
-              id="autorotate"
-              checked={form.isAutoRotate}
-              onChange={set('isAutoRotate')}
-              className="w-5 h-5 cursor-pointer accent-accent-orange"
+              type="date"
+              value={form.dueDate}
+              onChange={set('dueDate')}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full bg-white/5 border border-glass-border rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-accent-purple transition-all font-mono"
             />
-            <label htmlFor="autorotate" className="text-[15px] cursor-pointer flex-1 text-white">
-              Auto-rotate between roommates
-            </label>
-            {form.isAutoRotate && (
-              <Select value={form.rotationFrequency} onChange={set('rotationFrequency')} className="w-44">
-                {FREQUENCIES.map(f => <option key={f.value} value={f.value} className="bg-obsidian">{f.label}</option>)}
-              </Select>
+            {errors.dueDate && (
+              <p className="text-xs text-accent-rose font-medium">{errors.dueDate}</p>
             )}
           </div>
 
-          {/* Assignment */}
-          {!form.isAutoRotate ? (
-            <Select label="Assign to" value={form.assignedTo} onChange={set('assignedTo')}>
-              {members?.map(m => (
-                <option key={m.user._id} value={m.user._id} className="bg-obsidian">{m.user.name}</option>
-              ))}
-            </Select>
-          ) : (
-            <div>
-              <div className="font-label-caps text-[11px] mb-3 tracking-[0.15em] text-primary-muted pl-1">
-                Rotation order <span className="text-white/30 lowercase">(starts with first person)</span>
+          {/* Auto-rotate Toggle */}
+          <div 
+            onClick={() => setForm(f => ({ ...f, isAutoRotate: !f.isAutoRotate }))}
+            className="flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-5 h-5 rounded-lg flex items-center justify-center border transition-all ${
+                form.isAutoRotate ? 'bg-accent-purple border-accent-purple text-white' : 'border-white/20 bg-transparent'
+              }`}>
+                {form.isAutoRotate && <Check size={13} className="stroke-[3]" />}
               </div>
-              <div className="border border-glass-border rounded-2xl overflow-hidden divide-y divide-glass-border bg-black/20">
+              <div>
+                <div className="text-xs font-medium text-white">Auto-rotate between housemates</div>
+                <div className="text-[10px] text-primary-muted">Automatically passes to the next person upon completion</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Frequency Chips if Auto-Rotate */}
+          {form.isAutoRotate && (
+            <div className="space-y-2 animate-fade-up">
+              <label className="text-xs text-primary-muted font-medium block">Rotation Cadence</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {FREQUENCIES.map(f => (
+                  <button
+                    key={f.value}
+                    type="button"
+                    onClick={() => setForm(formState => ({ ...formState, rotationFrequency: f.value }))}
+                    className={`py-2 px-2 rounded-xl text-xs font-label-caps uppercase tracking-wider transition-all text-center ${
+                      form.rotationFrequency === f.value
+                        ? 'bg-accent-purple text-white font-bold shadow-glow scale-[1.02]'
+                        : 'bg-white/5 text-primary-muted hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Single Assignee OR Rotation Order */}
+          {!form.isAutoRotate ? (
+            <div className="space-y-2">
+              <label className="text-xs text-primary-muted font-medium block">Assigned Roommate</label>
+              <div className="grid grid-cols-2 gap-2">
+                {members?.map(m => {
+                  const isSelected = form.assignedTo === m.user._id
+                  return (
+                    <div
+                      key={m.user._id}
+                      onClick={() => setForm(f => ({ ...f, assignedTo: m.user._id }))}
+                      className={`p-2.5 rounded-2xl flex items-center gap-2.5 cursor-pointer border transition-all ${
+                        isSelected
+                          ? 'bg-accent-purple/20 border-accent-purple text-white shadow-glow'
+                          : 'bg-white/5 border-white/5 text-primary-muted hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Avatar name={m.user.name} src={m.user.avatar} size={28} />
+                      <span className="text-xs font-medium truncate">{m.user.name}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-primary-muted">
+                <span>Rotation Order</span>
+                <span className="text-[10px] font-mono">1st in line performs first</span>
+              </div>
+
+              <div className="rounded-2xl border border-glass-border bg-black/30 divide-y divide-white/5 max-h-40 overflow-y-auto custom-scrollbar">
                 {rotationOrder.map((uid, idx) => {
                   const m = findMember(uid)
                   return (
-                    <div key={uid} className="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors">
-                      <span className="font-display font-medium text-[16px] text-primary-muted w-4">{idx+1}</span>
-                      <Avatar name={m?.name} size={32} />
-                      <span className="flex-1 font-body-md text-[16px] text-white">{m?.name}</span>
-                      <button onClick={() => moveUp(idx)} disabled={idx===0} className="p-1.5 text-primary-muted hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:bg-white/10 rounded-full">
-                        <ArrowUp size={16} />
-                      </button>
-                      <button onClick={() => moveDown(idx)} disabled={idx===rotationOrder.length-1} className="p-1.5 text-primary-muted hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:bg-white/10 rounded-full">
-                        <ArrowDown size={16} />
-                      </button>
+                    <div key={uid} className="flex items-center justify-between p-2.5 gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="w-5 h-5 rounded-full bg-white/10 text-[10px] font-mono font-bold flex items-center justify-center text-accent-purple shrink-0">
+                          {idx + 1}
+                        </span>
+                        <Avatar name={m?.name || 'User'} src={m?.avatar} size={26} />
+                        <span className="text-xs font-medium text-white truncate">{m?.name}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveUp(idx)}
+                          disabled={idx === 0}
+                          className="p-1 text-primary-muted hover:text-white disabled:opacity-20 transition-colors"
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveDown(idx)}
+                          disabled={idx === rotationOrder.length - 1}
+                          className="p-1 text-primary-muted hover:text-white disabled:opacity-20 transition-colors"
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
@@ -177,13 +253,22 @@ export default function AddChoreModal({ houseId, members, onClose, onAdded }) {
             </div>
           )}
 
-          <div className="flex gap-4 pt-2">
-            <Button variant="secondary" onClick={onClose} className="flex-1">Cancel</Button>
-            <Button onClick={handleSubmit} loading={loading} className="flex-[2] shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-              <Plus size={18} /> Create chore
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <Button variant="secondary" onClick={onClose} className="flex-1 py-3 text-xs">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              loading={loading}
+              className="flex-[2] py-3 text-xs bg-gradient-to-r from-accent-purple to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold shadow-glow hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Plus size={16} /> Create Chore
             </Button>
           </div>
+
         </div>
+
       </div>
     </Overlay>
   )

@@ -1,16 +1,34 @@
 import { useState } from 'react'
-import { Button, Input, Select } from '../ui'
+import { Button, Input } from '../ui'
 import { Overlay, ModalHeader } from '../finance/AddExpenseModal'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { Send } from 'lucide-react'
+import { Send, UploadCloud, X, AlertTriangle } from 'lucide-react'
 
-const CATEGORIES  = ['plumbing','electrical','appliance','structural','pest','other']
-const PRIORITIES  = ['low','medium','high','urgent']
-const CATEGORY_ICONS = { plumbing:'🚰', electrical:'⚡', appliance:'🔌', structural:'🏗️', pest:'🐜', other:'🔧' }
+const CATEGORIES = ['plumbing', 'electrical', 'appliance', 'structural', 'pest', 'other']
+const CATEGORY_META = {
+  plumbing:   { icon: '🚰', label: 'Plumbing' },
+  electrical: { icon: '⚡', label: 'Electrical' },
+  appliance:  { icon: '🔌', label: 'Appliance' },
+  structural: { icon: '🏗️', label: 'Structural' },
+  pest:       { icon: '🐜', label: 'Pest Control' },
+  other:      { icon: '🔧', label: 'Other' },
+}
+
+const PRIORITIES = [
+  { value: 'low',    label: 'Low',    color: 'text-primary-muted border-white/10' },
+  { value: 'medium', label: 'Medium', color: 'text-amber-400 border-amber-400/40 bg-amber-400/10' },
+  { value: 'high',   label: 'High',   color: 'text-accent-orange border-accent-orange/40 bg-accent-orange/10' },
+  { value: 'urgent', label: 'Urgent', color: 'text-accent-rose border-accent-rose/50 bg-accent-rose/10' },
+]
 
 export default function ReportIssueModal({ houseId, onClose, onAdded }) {
-  const [form, setForm] = useState({ title:'', description:'', category:'other', priority:'medium' })
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    category: 'plumbing',
+    priority: 'medium'
+  })
   const [photo, setPhoto] = useState(null)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors]   = useState({})
@@ -22,8 +40,8 @@ export default function ReportIssueModal({ houseId, onClose, onAdded }) {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim())       e.title       = 'Title is required'
-    if (!form.description.trim()) e.description = 'Description is required'
+    if (!form.title.trim())       e.title       = 'Issue title is required'
+    if (!form.description.trim()) e.description = 'Please describe the issue in detail'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -34,8 +52,8 @@ export default function ReportIssueModal({ houseId, onClose, onAdded }) {
     try {
       const formData = new FormData()
       formData.append('houseId', houseId)
-      formData.append('title', form.title)
-      formData.append('description', form.description)
+      formData.append('title', form.title.trim())
+      formData.append('description', form.description.trim())
       formData.append('category', form.category)
       formData.append('priority', form.priority)
       if (photo) {
@@ -45,11 +63,11 @@ export default function ReportIssueModal({ houseId, onClose, onAdded }) {
       const { data } = await api.post('/maintenance', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      toast.success('Issue reported')
+      toast.success('🛠️ Maintenance ticket submitted to house log')
       onAdded(data)
       onClose()
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed')
+      toast.error(err.response?.data?.message || 'Failed to submit issue')
     } finally {
       setLoading(false)
     }
@@ -57,64 +75,155 @@ export default function ReportIssueModal({ houseId, onClose, onAdded }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-full max-w-lg glass-panel p-0 overflow-hidden border border-glass-border shadow-glow rounded-3xl">
-        <ModalHeader title="Report a maintenance issue" onClose={onClose} />
-        <div className="flex flex-col gap-6 px-8 pb-8 pt-4">
+      <div className="bento-card bg-obsidian/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] rounded-3xl overflow-hidden relative">
+        
+        {/* Top Accent Strip */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-accent-rose" />
+
+        <ModalHeader 
+          icon="🔧" 
+          title="Report Maintenance Issue" 
+          subtitle="File repair ticket with optional photo evidence"
+          onClose={onClose} 
+        />
+
+        <div className="p-6 sm:p-8 space-y-5">
+          
+          {/* Title */}
           <Input
-            label="Issue title"
-            placeholder='e.g. "AC not cooling properly"'
+            label="What is broken or needs repair? *"
+            placeholder='e.g. "Water heater leaking in master bath", "AC fuse tripped"'
             value={form.title}
             onChange={set('title')}
             error={errors.title}
+            className="bg-white/5 border-glass-border text-white text-sm"
           />
-          <div>
-            <div className="font-label-caps text-[11px] mb-2 tracking-[0.15em] text-primary-muted pl-1">Description</div>
+
+          {/* Category Chips */}
+          <div className="space-y-2">
+            <label className="text-xs text-primary-muted font-medium block">Category</label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map(c => {
+                const meta = CATEGORY_META[c]
+                const isSelected = form.category === c
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, category: c }))}
+                    className={`px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition-all ${
+                      isSelected
+                        ? 'bg-amber-400 text-obsidian font-bold shadow-glow scale-[1.02]'
+                        : 'bg-white/5 text-primary-muted hover:text-white border border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <span>{meta.icon}</span>
+                    <span>{meta.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Priority Level */}
+          <div className="space-y-2">
+            <label className="text-xs text-primary-muted font-medium block">Urgency Level</label>
+            <div className="grid grid-cols-4 gap-2">
+              {PRIORITIES.map(p => {
+                const isSelected = form.priority === p.value
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, priority: p.value }))}
+                    className={`py-2 px-2 rounded-xl text-xs font-label-caps uppercase tracking-wider transition-all text-center border ${
+                      isSelected
+                        ? 'bg-white text-obsidian font-bold shadow-glow scale-[1.02]'
+                        : p.color
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-primary-muted font-medium block">Detailed Description *</label>
             <textarea
               value={form.description}
               onChange={set('description')}
-              placeholder="Describe the issue, when it started, and any details..."
+              placeholder="Describe what happened, when it started, and current impact..."
               rows={3}
-              className={[
-                'w-full px-4 py-3 bg-white/5 border rounded-xl text-[15px] text-white resize-y outline-none placeholder:text-white/20 transition-colors',
-                errors.description ? 'border-accent-rose focus:border-accent-rose focus:bg-accent-rose/5' : 'border-glass-border focus:border-accent-orange focus:bg-white/10',
-              ].join(' ')}
+              className="w-full bg-white/5 border border-glass-border rounded-2xl p-3 text-xs text-white placeholder-primary-muted/40 focus:outline-none focus:border-amber-400 transition-all resize-none"
             />
-            {errors.description && <span className="text-[12px] text-accent-rose mt-1 block pl-1 font-medium">{errors.description}</span>}
+            {errors.description && (
+              <p className="text-xs text-accent-rose font-medium">{errors.description}</p>
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Select label="Category" value={form.category} onChange={set('category')}>
-              {CATEGORIES.map(c => <option key={c} value={c} className="bg-obsidian text-white">{CATEGORY_ICONS[c]} {c.charAt(0).toUpperCase()+c.slice(1)}</option>)}
-            </Select>
-            <Select label="Priority" value={form.priority} onChange={set('priority')}>
-              {PRIORITIES.map(p => <option key={p} value={p} className="bg-obsidian text-white">{p.charAt(0).toUpperCase()+p.slice(1)}</option>)}
-            </Select>
-          </div>
-          <div>
-            <div className="font-label-caps text-[11px] mb-2 tracking-[0.15em] text-primary-muted pl-1">Photo Evidence (Optional)</div>
-            <label className="flex flex-col items-center justify-center w-full h-32 bg-white/5 border-2 border-dashed border-glass-border rounded-xl cursor-pointer hover:bg-white/10 hover:border-accent-orange/50 transition-all group overflow-hidden relative">
+
+          {/* Photo Evidence Upload Box */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-primary-muted font-medium block">Photo Evidence (Optional)</label>
+            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-glass-border hover:border-amber-400/50 rounded-2xl cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all group relative">
               {photo ? (
-                <div className="text-center">
-                  <div className="text-accent-orange font-bold font-body">{photo.name}</div>
-                  <div className="text-[12px] text-primary-muted font-mono mt-1">{(photo.size / 1024 / 1024).toFixed(2)} MB</div>
+                <div className="flex items-center justify-between w-full px-2">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-xl">📸</span>
+                    <div className="truncate text-left">
+                      <p className="text-xs font-bold text-white truncate">{photo.name}</p>
+                      <p className="text-[10px] text-primary-muted font-mono">{(photo.size / (1024 * 1024)).toFixed(2)} MB</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setPhoto(null)
+                    }}
+                    className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-primary-muted hover:text-white"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl opacity-60 group-hover:opacity-100 group-hover:text-accent-orange transition-all">📸</span>
+                <div className="flex items-center gap-3 text-center py-2">
+                  <UploadCloud size={22} className="text-primary-muted group-hover:text-amber-400 transition-colors" />
+                  <div className="text-left">
+                    <p className="text-xs font-medium text-white">Upload image proof</p>
+                    <p className="text-[10px] text-primary-muted">PNG, JPG or WEBP up to 5MB</p>
                   </div>
-                  <p className="text-[13px] text-primary-muted font-body">Click to upload photo</p>
                 </div>
               )}
-              <input type="file" className="hidden" accept="image/*" onChange={e => setPhoto(e.target.files[0])} />
+              <input 
+                type="file" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={e => {
+                  if (e.target.files?.[0]) setPhoto(e.target.files[0])
+                }} 
+              />
             </label>
           </div>
-          <div className="flex gap-4 pt-2">
-            <Button variant="secondary" onClick={onClose} className="flex-1">Cancel</Button>
-            <Button onClick={handleSubmit} loading={loading} className="flex-[2] shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-              <Send size={18} /> Report issue
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <Button variant="secondary" onClick={onClose} className="flex-1 py-3 text-xs">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              loading={loading}
+              className="flex-[2] py-3 text-xs bg-gradient-to-r from-amber-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-obsidian font-bold shadow-glow hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Send size={16} /> Submit Ticket
             </Button>
           </div>
+
         </div>
+
       </div>
     </Overlay>
   )

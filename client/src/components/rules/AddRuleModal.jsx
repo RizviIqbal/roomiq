@@ -1,15 +1,34 @@
 import { useState } from 'react'
-import { Button, Input, Select } from '../ui'
+import { Button, Input } from '../ui'
 import { Overlay, ModalHeader } from '../finance/AddExpenseModal'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { Plus } from 'lucide-react'
+import { Plus, Check, Vote } from 'lucide-react'
 
-const CATEGORIES = ['guests','noise','cleanliness','kitchen','bathroom','general']
-const CATEGORY_ICONS = { guests:'👥', noise:'🔊', cleanliness:'🧹', kitchen:'🍳', bathroom:'🚿', general:'📋' }
+const CATEGORIES = ['guests', 'noise', 'cleanliness', 'kitchen', 'bathroom', 'general']
+const CATEGORY_META = {
+  guests:      { icon: '👥', label: 'Guests' },
+  noise:       { icon: '🔊', label: 'Noise' },
+  cleanliness: { icon: '🧹', label: 'Cleanliness' },
+  kitchen:     { icon: '🍳', label: 'Kitchen' },
+  bathroom:    { icon: '🚿', label: 'Bathroom' },
+  general:     { icon: '📋', label: 'General' },
+}
+
+const VOTING_PERIODS = [
+  { value: '1', label: '24 Hours' },
+  { value: '3', label: '3 Days' },
+  { value: '5', label: '5 Days' },
+  { value: '7', label: '1 Week' },
+]
 
 export default function AddRuleModal({ houseId, onClose, onAdded }) {
-  const [form, setForm] = useState({ title:'', description:'', category:'general', votingDays:'3' })
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    category: 'general',
+    votingDays: '3'
+  })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors]   = useState({})
 
@@ -20,7 +39,7 @@ export default function AddRuleModal({ houseId, onClose, onAdded }) {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim()) e.title = 'Title is required'
+    if (!form.title.trim()) e.title = 'Rule proposal title is required'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -31,10 +50,13 @@ export default function AddRuleModal({ houseId, onClose, onAdded }) {
     try {
       const votingDeadline = new Date(Date.now() + Number(form.votingDays) * 24 * 60 * 60 * 1000)
       const { data } = await api.post('/rules', {
-        houseId, title: form.title, description: form.description,
-        category: form.category, votingDeadline,
+        houseId,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        category: form.category,
+        votingDeadline,
       })
-      toast.success('Rule proposed — voting is now open')
+      toast.success('🗳️ Rule proposed — democratic voting is now live')
       onAdded(data)
       onClose()
     } catch (err) {
@@ -46,44 +68,105 @@ export default function AddRuleModal({ houseId, onClose, onAdded }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-full max-w-lg glass-panel p-0 overflow-hidden border border-glass-border shadow-glow rounded-3xl">
-        <ModalHeader title="Propose a house rule" onClose={onClose} />
-        <div className="flex flex-col gap-6 px-8 pb-8 pt-4">
+      <div className="bento-card bg-obsidian/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] rounded-3xl overflow-hidden relative">
+        
+        {/* Top Accent Strip */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-cyan via-teal-400 to-accent-emerald" />
+
+        <ModalHeader 
+          icon="📜" 
+          title="Propose House Agreement" 
+          subtitle="Initiate a community quorum ballot"
+          onClose={onClose} 
+        />
+
+        <div className="p-6 sm:p-8 space-y-5">
+          
+          {/* Title */}
           <Input
-            label="Rule title"
-            placeholder='e.g. "No guests after 11 PM on weekdays"'
+            label="Rule Statement *"
+            placeholder='e.g. "Quiet hours from 11 PM to 7 AM on weekdays"'
             value={form.title}
             onChange={set('title')}
             error={errors.title}
+            className="bg-white/5 border-glass-border text-white text-sm"
           />
-          <div>
-            <div className="font-label-caps text-[11px] mb-2 tracking-[0.15em] text-primary-muted pl-1">Description (optional)</div>
+
+          {/* Interactive Category Chips */}
+          <div className="space-y-2">
+            <label className="text-xs text-primary-muted font-medium block">Category</label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map(c => {
+                const meta = CATEGORY_META[c]
+                const isSelected = form.category === c
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, category: c }))}
+                    className={`px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition-all ${
+                      isSelected
+                        ? 'bg-accent-cyan text-obsidian font-bold shadow-glow scale-[1.02]'
+                        : 'bg-white/5 text-primary-muted hover:text-white border border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <span>{meta.icon}</span>
+                    <span>{meta.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Description / Reasoning */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-primary-muted font-medium block">Reasoning & Context (Optional)</label>
             <textarea
               value={form.description}
               onChange={set('description')}
-              placeholder="Explain the reasoning behind this rule..."
+              placeholder="Explain why this rule benefits house harmony..."
               rows={3}
-              className="w-full px-4 py-3 bg-white/5 border border-glass-border rounded-xl text-[15px] text-white resize-y outline-none focus:border-accent-orange focus:bg-white/10 placeholder:text-white/20"
+              className="w-full bg-white/5 border border-glass-border rounded-2xl p-3 text-xs text-white placeholder-primary-muted/40 focus:outline-none focus:border-accent-cyan transition-all resize-none"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Select label="Category" value={form.category} onChange={set('category')}>
-              {CATEGORIES.map(c => <option key={c} value={c} className="bg-obsidian text-white">{CATEGORY_ICONS[c]} {c.charAt(0).toUpperCase()+c.slice(1)}</option>)}
-            </Select>
-            <Select label="Voting period" value={form.votingDays} onChange={set('votingDays')}>
-              <option value="1" className="bg-obsidian text-white">1 day</option>
-              <option value="3" className="bg-obsidian text-white">3 days</option>
-              <option value="5" className="bg-obsidian text-white">5 days</option>
-              <option value="7" className="bg-obsidian text-white">7 days</option>
-            </Select>
+
+          {/* Voting Period Chips */}
+          <div className="space-y-2">
+            <label className="text-xs text-primary-muted font-medium block">Voting Window</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {VOTING_PERIODS.map(v => (
+                <button
+                  key={v.value}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, votingDays: v.value }))}
+                  className={`py-2 px-2 rounded-xl text-xs font-label-caps uppercase tracking-wider transition-all text-center ${
+                    form.votingDays === v.value
+                      ? 'bg-white text-obsidian font-bold shadow-glow scale-[1.02]'
+                      : 'bg-white/5 text-primary-muted hover:text-white border border-white/5'
+                  }`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-4 pt-2">
-            <Button variant="secondary" onClick={onClose} className="flex-1">Cancel</Button>
-            <Button onClick={handleSubmit} loading={loading} className="flex-[2] shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-              <Plus size={18} /> Propose rule
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <Button variant="secondary" onClick={onClose} className="flex-1 py-3 text-xs">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              loading={loading}
+              className="flex-[2] py-3 text-xs bg-gradient-to-r from-accent-cyan to-teal-500 hover:from-teal-500 hover:to-teal-600 text-obsidian font-bold shadow-glow hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Vote size={16} /> Open Ballot
             </Button>
           </div>
+
         </div>
+
       </div>
     </Overlay>
   )
