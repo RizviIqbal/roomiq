@@ -25,8 +25,14 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
-  const register = async (name, email, password, phone, occupation, bkashNumber) => {
-    const { data } = await api.post('/auth/register', { name, email, password, phone, occupation, bkashNumber })
+  const register = async (userDataOrName, email, password, phone, occupation, bkashNumber) => {
+    let payload = {}
+    if (typeof userDataOrName === 'object') {
+      payload = userDataOrName
+    } else {
+      payload = { name: userDataOrName, email, password, phone, occupation, bkashNumber }
+    }
+    const { data } = await api.post('/auth/register', payload)
     localStorage.setItem('roomiq_token', data.token)
     localStorage.setItem('roomiq_user',  JSON.stringify(data))
     setUser(data)

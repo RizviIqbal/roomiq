@@ -5,12 +5,23 @@ const generateToken = require("../utils/generateToken");
 // @route   POST /api/auth/register
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone, occupation, bkashNumber } = req.body;
+    const { name, email, password, phone, occupation, bkashNumber, gender, budgetMax, bio, avatar } = req.body;
 
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: "Email already registered" });
 
-    const user = await User.create({ name, email, password, phone, occupation, bkashNumber });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      phone, 
+      occupation, 
+      bkashNumber,
+      gender: gender || "",
+      budgetMax: budgetMax ? Number(budgetMax) : null,
+      bio: bio || "",
+      avatar: avatar || ""
+    });
 
     res.status(201).json({
       _id:   user._id,

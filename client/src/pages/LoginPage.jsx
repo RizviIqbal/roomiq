@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Button, Input } from '../components/ui'
-import { Mail, Lock, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { Button, Input, Badge } from '../components/ui'
+import { Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
+
+const DEMO_ACCOUNTS = [
+  { name: 'Rafiq Ahmed', role: 'House Admin', email: 'rafiq@test.com', desc: 'Mirpur Nest Manager', icon: '👑' },
+  { name: 'Aisha Rahman', role: 'Resident', email: 'aisha@test.com', desc: 'Active Roommate', icon: '🏠' },
+  { name: 'Farhan Kabir', role: 'Resident', email: 'farhan@test.com', desc: 'Active Roommate', icon: '🏠' },
+  { name: 'Kamil Hossain', role: 'Free Agent', email: 'kamil@test.com', desc: 'Looking for a House', icon: '🔍' },
+]
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -25,147 +32,131 @@ export default function LoginPage() {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = async () => {
-    if (!validate()) return
+  const handleLoginSubmit = async (customEmail, customPassword) => {
+    const emailToUse = customEmail || form.email
+    const passwordToUse = customPassword || form.password
+
+    if (!customEmail && !validate()) return
     setLoading(true)
     try {
-      const user = await login(form.email, form.password)
+      const user = await login(emailToUse, passwordToUse)
       toast.success(`Welcome back, ${user.name.split(' ')[0]}!`)
       navigate(user.currentHouse ? '/app/dashboard' : '/house-setup')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed')
+      toast.error(err.response?.data?.message || 'Login failed. Please check credentials.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
+  const handleKeyDown = (e) => { if (e.key === 'Enter') handleLoginSubmit() }
 
-  const fillDemo = (email) => setForm({ email, password: 'password123' })
+  const handleQuickDemoLogin = (email) => {
+    setForm({ email, password: 'password123' })
+    handleLoginSubmit(email, 'password123')
+  }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-obsidian relative overflow-hidden">
-      {/* Left Panel - Feature Highlight */}
-      <div className="hidden lg:flex flex-col justify-between p-12 lg:p-24 relative z-10 border-r border-glass-border overflow-hidden">
-        {/* Premium Image Background */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2000&auto=format&fit=crop" 
-            alt="Modern home interior" 
-            className="w-full h-full object-cover opacity-40 scale-105 animate-[slow-pan_20s_ease-in-out_infinite_alternate]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-obsidian/90 via-obsidian/70 to-transparent mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent opacity-80" />
-        </div>
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-obsidian relative overflow-hidden text-white font-body">
+      
+      {/* ========================================================= */}
+      {/* LEFT COLUMN: BRANDING & PRODUCT SHOWCASE (5 cols) */}
+      {/* ========================================================= */}
+      <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-12 xl:p-16 relative z-10 border-r border-glass-border bg-white/[0.01] backdrop-blur-2xl">
+        
+        {/* Background Ambient Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] bg-accent-purple/20 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] bg-accent-orange/20 rounded-full blur-[130px] pointer-events-none" />
 
-        {/* Decorative elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-accent-orange/30 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '6s' }} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-accent-purple/30 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '8s' }} />
-
+        {/* Top Logo */}
         <div className="relative z-10">
-          <Link to="/" className="inline-flex font-display font-bold text-2xl items-center gap-3 mb-16 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-accent-purple to-accent-orange flex items-center justify-center text-white text-lg shadow-[0_0_20px_rgba(0,229,255,0.3)]">R</div>
-            Roomi<span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-orange to-accent-purple">Q</span>
+          <Link to="/" className="inline-flex items-center gap-2.5 font-display text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-accent-purple to-accent-orange flex items-center justify-center text-white text-base shadow-glow">
+              R
+            </div>
+            <span>Roomi<span className="text-accent-orange">Q</span></span>
           </Link>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-6xl font-bold leading-[1.1] text-white mb-6 drop-shadow-lg"
-          >
-            Share a home,<br/>not the stress.
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="font-body text-xl text-white/80 max-w-md drop-shadow-md"
-          >
-            Log in to manage your house, track shared expenses, and check off your chores for the week.
-          </motion.p>
+
+          <div className="mt-16 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple font-label-caps text-[10px] uppercase tracking-wider">
+              <Sparkles size={12} className="animate-pulse text-accent-orange" /> Smart Shared Living Platform
+            </div>
+
+            <h1 className="font-display text-5xl font-bold text-white tracking-tight leading-[1.1]">
+              Shared living,<br />
+              <span className="text-gradient">reimagined.</span>
+            </h1>
+
+            <p className="font-body text-base text-primary-muted max-w-sm leading-relaxed">
+              Track shared expenses, automate chore duties, and resolve disputes without the awkward conversations.
+            </p>
+          </div>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="bento-card p-8 rounded-[2rem] border border-white/20 bg-black/40 backdrop-blur-xl relative overflow-hidden max-w-lg mt-12 shadow-2xl"
-        >
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-orange to-accent-purple" />
-          <p className="font-body text-lg text-white/90 leading-relaxed mb-8">"RoomiQ completely eliminated the awkward 'who bought the toilet paper last' conversations. The balance tracker is an absolute lifesaver."</p>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-white shadow-inner border border-white/30">AM</div>
+        {/* Testimonial Bento */}
+        <div className="bento-card rounded-3xl p-6 relative overflow-hidden z-10 border-white/10 space-y-4">
+          <p className="text-sm text-white/90 leading-relaxed">
+            "RoomiQ transformed our 5-person apartment. Expenses are auto-split, chore rotations are clear, and everyone stays accountable."
+          </p>
+          
+          <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent-orange to-accent-purple flex items-center justify-center text-white font-bold text-xs shadow-inner">
+              RN
+            </div>
             <div>
-              <div className="text-white font-bold font-body">Alex M.</div>
-              <div className="text-accent-orange text-[10px] font-label-caps tracking-[0.2em] mt-1 drop-shadow-md">Living in Brooklyn</div>
+              <div className="text-xs font-bold text-white">Rafiq Ahmed</div>
+              <div className="text-[10px] text-primary-muted font-mono">Mirpur Nest House Admin</div>
             </div>
           </div>
-        </motion.div>
-      </div>
-
-      {/* Right Panel - Login Form */}
-      <div className="flex flex-col justify-center p-6 lg:p-16 xl:p-24 relative z-10 bg-obsidian overflow-hidden">
-        
-        {/* Dynamic Abstract Background Layer */}
-        <div className="absolute inset-0 z-0 opacity-60">
-          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-accent-orange/30 rounded-full blur-[120px] mix-blend-screen animate-[spin_20s_linear_infinite]" />
-          <div className="absolute bottom-[-20%] left-[-10%] w-[700px] h-[700px] bg-accent-purple/30 rounded-full blur-[150px] mix-blend-screen animate-[spin_25s_linear_infinite_reverse]" />
-          <div className="absolute top-[40%] left-[30%] w-[400px] h-[400px] bg-accent-rose/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDuration: '4s' }} />
         </div>
 
-        {/* Technical Grid Overlay */}
-        <div 
-          className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-          style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '40px 40px', maskImage: 'radial-gradient(circle at center, black, transparent 80%)', WebkitMaskImage: 'radial-gradient(circle at center, black, transparent 80%)' }} 
-        />
+        {/* Footer Meta */}
+        <div className="relative z-10 flex items-center justify-between text-xs text-primary-muted">
+          <span>© 2026 RoomiQ Platform</span>
+          <span className="flex items-center gap-1"><ShieldCheck size={13} className="text-accent-emerald" /> 256-bit Encrypted</span>
+        </div>
+
+      </div>
+
+      {/* ========================================================= */}
+      {/* RIGHT COLUMN: LOGIN FORM & FAST DEMO LAUNCHER (7 cols) */}
+      {/* ========================================================= */}
+      <div className="lg:col-span-7 flex flex-col justify-center p-6 sm:p-10 lg:p-16 xl:p-20 relative z-10 overflow-y-auto">
         
-        {/* Noise Texture for Premium Feel */}
-        <div className="absolute inset-0 z-0 opacity-[0.15] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
-        
-        {/* Darkening Gradient to preserve legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-obsidian/40 via-transparent to-obsidian/80 pointer-events-none z-0" />
-        
-        <div className="w-full max-w-[420px] mx-auto relative z-10">
-          {/* Mobile Header (Hidden on Desktop) */}
-          <div className="lg:hidden text-center mb-10">
-            <Link to="/" className="inline-flex font-display font-bold text-4xl items-center gap-2 mb-3">
-              Roomi<span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-orange to-accent-purple">Q</span>
+        {/* Background Ambient Orbs */}
+        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-accent-orange/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] bg-accent-purple/15 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="w-full max-w-[440px] mx-auto space-y-8 relative z-10">
+          
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center space-y-2">
+            <Link to="/" className="inline-flex items-center gap-2 font-display text-3xl font-bold">
+              Roomi<span className="text-accent-orange">Q</span>
             </Link>
-            <div className="font-label-caps text-[10px] uppercase tracking-[0.2em] text-primary-muted">Welcome to your shared home</div>
+            <p className="text-xs text-primary-muted font-label-caps uppercase tracking-wider">Welcome back to your house</p>
           </div>
 
           {/* Form Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-            className="mb-10 hidden lg:block"
-          >
-            <h2 className="font-display text-4xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="font-body text-primary-muted">Enter your credentials to access your house dashboard.</p>
-          </motion.div>
+          <div className="hidden lg:block space-y-1">
+            <h2 className="font-display text-3xl font-bold text-white tracking-tight">Sign In to RoomiQ</h2>
+            <p className="text-sm text-primary-muted">Enter your credentials or click any demo account below.</p>
+          </div>
 
-          {/* Form Card */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
-            className="bento-card rounded-[32px] p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative group border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden"
-          >
-            <div className="absolute inset-0 rounded-[32px] ring-1 ring-white/10 group-hover:ring-accent-orange/30 transition-all duration-500 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
-
-            <div className="flex flex-col gap-5 relative z-10">
+          {/* Login Form Bento Card */}
+          <div className="bento-card rounded-3xl p-6 sm:p-8 space-y-5 border-white/10 shadow-2xl">
+            
+            <div className="space-y-4">
               <Input
                 label="Email Address"
                 type="email"
-                placeholder="alice@test.com"
+                placeholder="rafiq@test.com"
                 value={form.email}
                 onChange={set('email')}
                 onKeyDown={handleKeyDown}
                 error={errors.email}
-                icon={<Mail size={18} />}
-                className="bg-black/60 border-white/10 text-white font-body"
+                icon={<Mail size={17} />}
+                className="bg-white/5 border-glass-border text-white text-sm"
               />
 
               <div className="relative">
@@ -177,70 +168,82 @@ export default function LoginPage() {
                   onChange={set('password')}
                   onKeyDown={handleKeyDown}
                   error={errors.password}
-                  icon={<Lock size={18} />}
-                  className="bg-black/60 border-white/10 text-white font-body pr-12"
+                  icon={<Lock size={17} />}
+                  className="bg-white/5 border-glass-border text-white text-sm pr-11"
                 />
                 <button
+                  type="button"
                   onClick={() => setShowPw(s => !s)}
-                  className="absolute right-4 top-[36px] text-primary-muted hover:text-white transition-colors"
-                  tabIndex={-1}
+                  className="absolute right-3.5 top-[38px] text-primary-muted hover:text-white transition-colors"
                 >
-                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
 
-              <Button 
-                onClick={handleSubmit} 
-                loading={loading} 
-                fullWidth 
-                size="lg" 
-                className="mt-4 !rounded-2xl shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-shadow text-[15px] font-bold tracking-wide font-body"
+              <Button
+                onClick={() => handleLoginSubmit()}
+                loading={loading}
+                fullWidth
+                size="lg"
+                className="bg-gradient-to-r from-accent-purple to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold text-sm shadow-glow mt-2"
               >
-                Sign In
+                Sign In →
               </Button>
             </div>
 
-            <div className="my-8 flex items-center justify-center relative z-10">
-              <div className="h-px bg-white/10 flex-1" />
-              <span className="px-4 font-label-caps text-[10px] tracking-[0.2em] text-primary-muted uppercase flex items-center gap-2">
-                <Sparkles size={12} className="text-accent-purple" /> Seeded Accounts
-              </span>
-              <div className="h-px bg-white/10 flex-1" />
+            {/* Fast-Pass Seeded Demo Accounts */}
+            <div className="pt-4 border-t border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-label-caps text-[10px] uppercase tracking-widest text-primary-muted flex items-center gap-1.5">
+                  <Zap size={13} className="text-accent-orange" /> 1-Click Demo Launcher
+                </span>
+                <span className="text-[10px] text-primary-muted font-mono">pw: password123</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                {DEMO_ACCOUNTS.map(acc => (
+                  <button
+                    key={acc.email}
+                    onClick={() => handleQuickDemoLogin(acc.email)}
+                    disabled={loading}
+                    className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.98] border border-glass-border text-left transition-all group flex flex-col justify-between hover:border-accent-orange/40 hover:shadow-glow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-base">{acc.icon}</span>
+                      <span className="text-[9px] font-label-caps uppercase px-1.5 py-0.5 rounded-full bg-white/5 text-primary-muted group-hover:text-accent-orange">
+                        {acc.role}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="text-xs font-bold text-white group-hover:text-accent-orange transition-colors truncate">
+                        {acc.name}
+                      </div>
+                      <div className="text-[10px] text-primary-muted font-mono truncate opacity-60">
+                        {acc.email}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 relative z-10">
-              {[
-                { name: 'Rafiq (Admin)', email: 'rafiq@test.com' },
-                { name: 'Aisha', email: 'aisha@test.com' },
-                { name: 'Farhan', email: 'farhan@test.com' },
-                { name: 'Zara', email: 'zara@test.com' },
-                { name: 'Kamil', email: 'kamil@test.com' },
-              ].map(a => (
-                <button
-                  key={a.email}
-                  onClick={() => fillDemo(a.email)}
-                  className="px-4 py-3 bg-black/40 border border-white/10 rounded-2xl font-label-caps text-[10px] tracking-[0.1em] uppercase text-primary-muted hover:border-accent-orange/50 hover:bg-accent-orange/10 hover:text-white hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all text-left group/btn"
-                >
-                  <div className="text-white font-body font-bold group-hover/btn:text-accent-orange transition-colors">{a.name}</div>
-                  <div className="mt-1 opacity-60 text-[9px] font-mono">{a.email}</div>
-                </button>
-              ))}
-            </div>
-          </motion.div>
+          </div>
 
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-center mt-10 font-body text-[15px] text-primary-muted"
-          >
-            New to RoomiQ?{' '}
-            <Link to="/register" className="text-white font-bold hover:text-accent-orange transition-colors underline decoration-white/30 underline-offset-4 hover:decoration-accent-orange">
-              Create an account
+          {/* Footer Registration Link */}
+          <p className="text-center text-sm text-primary-muted">
+            Don't have an account yet?{' '}
+            <Link 
+              to="/register" 
+              className="text-white font-bold hover:text-accent-orange transition-colors underline decoration-white/30 underline-offset-4 hover:decoration-accent-orange"
+            >
+              Create Account
             </Link>
-          </motion.p>
+          </p>
+
         </div>
+
       </div>
+
     </div>
   )
 }
