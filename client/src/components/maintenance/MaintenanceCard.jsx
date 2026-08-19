@@ -85,6 +85,21 @@ export default function MaintenanceCard({ issue, onRefresh }) {
                 <p className="font-body text-[16px] text-white/80 leading-relaxed bg-white/5 p-5 rounded-2xl border border-glass-border">{issue.description}</p>
               </div>
 
+              {issue.statusHistory?.some(h => h.status === 'expense_created') && (
+                <div className="bg-accent-emerald/10 border border-accent-emerald/30 p-4 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">💳</span>
+                    <div>
+                      <div className="font-display text-white font-medium text-sm">Converted to Shared Expense</div>
+                      <div className="font-body text-xs text-primary-muted">
+                        {issue.statusHistory.find(h => h.status === 'expense_created')?.note || 'Shared expense automatically created'}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge color="green">Expense Auto-Split</Badge>
+                </div>
+              )}
+
               {/* Status progression UI */}
               <div>
                 <div className="font-label-caps text-[11px] tracking-[0.15em] text-primary-muted mb-4">Resolution Tracker</div>

@@ -1,5 +1,6 @@
 const Maintenance = require("../models/Maintenance");
 const { emitToHouse } = require("../socket");
+const logActivity = require("../utils/activityLogger");
 
 // @desc   Report a maintenance issue
 // @route  POST /api/maintenance
@@ -26,6 +27,7 @@ const reportIssue = async (req, res) => {
 
     await issue.populate("reportedBy", "name avatar");
 
+    logActivity(houseId, req.user._id, "maintenance_reported", `Reported issue: ${title}`, `Priority: ${priority}`);
     emitToHouse(houseId, "maintenance_updated", { type: "reported", issue });
 
     res.status(201).json(issue);
@@ -98,8 +100,12 @@ const updateStatus = async (req, res) => {
             updatedBy: req.user._id, 
             note: `Expense of ৳${cost} created` 
           });
+
+          logActivity(issue.house, req.user._id, "expense_added", `Auto-converted maintenance expense: ${issue.title}`, `Total: ৳${cost} (Split across ${house.members.length} members)`);
         }
       }
+
+      logActivity(issue.house, req.user._id, "maintenance_resolved", `Resolved issue: ${issue.title}`, cost > 0 ? `Converted to expense: ৳${cost}` : "Issue resolved");
     }
 
     await issue.save();
