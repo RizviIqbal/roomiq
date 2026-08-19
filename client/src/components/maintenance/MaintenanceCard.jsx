@@ -153,23 +153,34 @@ export default function MaintenanceCard({ issue, onRefresh }) {
 
                           {isCurrent && nextStatus && (
                             <div className="mt-4 p-5 bg-accent-orange/5 border border-accent-orange/20 rounded-2xl flex flex-col gap-3">
-                              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                                <input
-                                  value={note}
-                                  onChange={e => setNote(e.target.value)}
-                                  placeholder="Add a note to update status..."
-                                  className="flex-1 w-full px-4 py-2.5 text-[14px] bg-black/40 border border-accent-orange/30 rounded-xl text-white outline-none focus:border-accent-orange placeholder:text-white/30"
-                                />
-                                {nextStatus === 'resolved' && (
+                              <input
+                                value={note}
+                                onChange={e => setNote(e.target.value)}
+                                placeholder="Add a note to update status..."
+                                className="w-full px-4 py-2.5 text-[14px] bg-black/40 border border-accent-orange/30 rounded-xl text-white outline-none focus:border-accent-orange placeholder:text-white/30"
+                              />
+                              
+                              {nextStatus === 'resolved' && (
+                                <div className="space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <label className="font-label-caps text-[11px] tracking-[0.15em] text-primary-muted uppercase">
+                                      Cost (Auto-split among all roommates)
+                                    </label>
+                                    {cost && Number(cost) > 0 && (
+                                      <span className="text-[10px] font-mono text-accent-emerald">
+                                        ≈ ৳{(Number(cost) / 4).toFixed(0)}/person (est.)
+                                      </span>
+                                    )}
+                                  </div>
                                   <input
                                     type="number"
+                                    placeholder="৳ Amount"
                                     value={cost}
                                     onChange={e => setCost(e.target.value)}
-                                    placeholder="Cost (৳) - Auto-splits"
-                                    className="w-full sm:w-64 px-4 py-2.5 text-[14px] bg-black/40 border border-accent-orange/30 rounded-xl text-white outline-none focus:border-accent-orange placeholder:text-white/30"
+                                    className="w-full bg-black/40 border border-accent-orange/30 rounded-xl px-4 py-3 text-white text-[14px] font-mono placeholder:text-white/30 focus:outline-none focus:border-accent-orange transition-colors"
                                   />
-                                )}
-                              </div>
+                                </div>
+                              )}
                               <Button onClick={advance} loading={loading} className="w-full sm:w-auto self-end shadow-[0_0_15px_rgba(249,115,22,0.3)] whitespace-nowrap">
                                 Mark {STATUS_LABELS[nextStatus]} <ArrowRight size={16} className="ml-2" />
                               </Button>
