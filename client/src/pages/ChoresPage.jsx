@@ -249,8 +249,8 @@ export default function ChoresPage() {
               All
             </button>
             <button
-              onClick={() => setFilterType('mine')}
-              className={`px-3 py-1 rounded-full transition-colors ${filterType === 'mine' ? 'bg-white/10 text-white font-bold' : 'text-primary-muted hover:text-white'}`}
+              onClick={() => setFilterType('my_chores')}
+              className={`px-3 py-1 rounded-full transition-colors ${filterType === 'my_chores' ? 'bg-white/10 text-white font-bold' : 'text-primary-muted hover:text-white'}`}
             >
               My Duties
             </button>
