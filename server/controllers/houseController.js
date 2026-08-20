@@ -114,27 +114,58 @@ const removeMember = async (req, res) => {
   }
 };
 
-// @desc   Leave house
+// @desc   Leave house (Protected: requires 0 outstanding debt & admin transfer)
 // @route  POST /api/houses/:houseId/leave
 const leaveHouse = async (req, res) => {
   try {
+    const Expense = require("../models/Expense");
+    const Chore   = require("../models/Chore");
+    const { calculateBalances } = require("../utils/balanceCalculator");
+
     const house = await House.findById(req.params.houseId);
     if (!house) return res.status(404).json({ message: "House not found" });
 
     const member = house.members.find(m => m.user.toString() === req.user._id.toString());
-    if (!member) return res.status(400).json({ message: "You are not a member" });
+    if (!member) return res.status(400).json({ message: "You are not a member of this house" });
 
+    // 1. Admin transfer enforcement
     if (member.role === "admin" && house.members.length > 1) {
-      return res.status(400).json({ message: "Transfer admin role before leaving" });
+      return res.status(400).json({ 
+        message: "You are the House Admin. Please transfer the admin role to another housemate before leaving." 
+      });
     }
 
+    // 2. Financial debt verification - cannot leave with unpaid debts
+    const expenses = await Expense.find({ house: req.params.houseId }).lean();
+    const debts = calculateBalances(expenses);
+    const userDebts = debts.filter(d => d.debtor.toString() === req.user._id.toString());
+    const totalOwed = userDebts.reduce((sum, d) => sum + d.amount, 0);
+
+    if (totalOwed > 0) {
+      return res.status(400).json({ 
+        message: `Financial Clearance Required: You currently owe ৳${totalOwed.toFixed(2)} in shared house expenses. Please settle all balances before leaving the house.` 
+      });
+    }
+
+    // 3. Clean up pending chore assignments (reassign to admin or unassign)
+    const adminMember = house.members.find(m => m.role === "admin" && m.user.toString() !== req.user._id.toString());
+    if (adminMember) {
+      await Chore.updateMany(
+        { house: req.params.houseId, assignedTo: req.user._id, status: { $ne: "completed" } },
+        { assignedTo: adminMember.user }
+      );
+    }
+
+    // 4. Remove member from house
     house.members = house.members.filter(m => m.user.toString() !== req.user._id.toString());
-    if (house.members.length === 0) house.isActive = false;
+    if (house.members.length === 0) {
+      house.isActive = false;
+    }
     await house.save();
 
     await User.findByIdAndUpdate(req.user._id, { currentHouse: null });
 
-    res.json({ message: "Left house successfully" });
+    res.json({ message: "Left house successfully. Your profile is now set to free agent." });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -200,15 +231,26 @@ const getPublicHouses = async (req, res) => {
     const results = houses.map(house => {
       let totalScore = 0;
       let validMembers = 0;
-      let adminId = null;
+      let adminUser = null;
 
-      house.members.forEach(m => {
-        if (m.role === 'admin') adminId = m.user._id;
-        if (m.user.compatibilityProfile?.sleepSchedule) {
+      const populatedMembers = house.members.map(m => {
+        let memberScore = null;
+        if (m.role === 'admin') adminUser = m.user;
+        if (m.user?.compatibilityProfile?.sleepSchedule) {
           const res = calculateCompatibility(currentUser.compatibilityProfile, m.user.compatibilityProfile);
+          memberScore = res.score;
           totalScore += res.score;
           validMembers++;
         }
+        return {
+          _id: m.user?._id,
+          name: m.user?.name,
+          avatar: m.user?.avatar,
+          role: m.role,
+          occupation: m.user?.occupation || 'Resident',
+          bio: m.user?.bio || '',
+          compatibilityScore: memberScore
+        };
       });
 
       const avgScore = validMembers > 0 ? Math.round(totalScore / validMembers) : null;
@@ -222,7 +264,9 @@ const getPublicHouses = async (req, res) => {
         totalRooms: house.totalRooms,
         memberCount: house.members.length,
         maxMembers: house.maxMembers,
-        adminId,
+        adminId: adminUser?._id,
+        adminName: adminUser?.name,
+        members: populatedMembers,
         images: house.images || [],
         compatibilityScore: avgScore,
         compatibilityLabel: avgScore ? (avgScore >= 80 ? "Highly Compatible" : avgScore >= 60 ? "Generally Compatible" : avgScore >= 40 ? "Some Friction" : "High Conflict") : "Not enough data"

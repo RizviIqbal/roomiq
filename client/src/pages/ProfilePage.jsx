@@ -2,13 +2,14 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Button, Input, Select, Avatar, Badge, ProgressBar } from '../components/ui'
+import { Overlay, ModalHeader } from '../components/finance/AddExpenseModal'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { 
   User, Phone, Image as ImageIcon, Heart, LogOut, Mail, Camera, 
   Home, DollarSign, Briefcase, Shield, Key, Copy, Check, 
   Sparkles, Moon, Sun, Volume2, Users, Cigarette, Dog, BookOpen, Utensils, 
-  Wallet, RefreshCw, X, AlertTriangle
+  Wallet, RefreshCw, X, AlertTriangle, AlertOctagon, CheckCircle2, ArrowRight
 } from 'lucide-react'
 
 const TRAIT_LABELS = {
@@ -189,16 +190,38 @@ export default function ProfilePage() {
     setTimeout(() => setCopiedCode(false), 2000)
   }
 
-  const handleLeaveHouse = async () => {
-    if (!window.confirm("Are you sure you want to leave this house? You will lose access to all shared expenses, chores, and house data.")) return
-    
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
+  const [checkingDebts, setCheckingDebts] = useState(false)
+  const [debtCheck, setDebtCheck] = useState({ totalOwed: 0, debts: [] })
+
+  const openLeaveHouseModal = async () => {
+    setShowLeaveModal(true)
+    setCheckingDebts(true)
+    try {
+      const houseId = user?.currentHouse?._id || user?.currentHouse
+      const { data } = await api.get(`/expenses/house/${houseId}/balances`)
+      const myDebts = (Array.isArray(data) ? data : []).filter(d => {
+        const debtorId = d.debtor?._id || d.debtor
+        return debtorId?.toString() === user._id.toString()
+      })
+      const totalOwed = myDebts.reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
+      setDebtCheck({ totalOwed, debts: myDebts })
+    } catch (err) {
+      setDebtCheck({ totalOwed: 0, debts: [] })
+    } finally {
+      setCheckingDebts(false)
+    }
+  }
+
+  const handleConfirmLeaveHouse = async () => {
     setLeaving(true)
     try {
       const houseId = user.currentHouse._id || user.currentHouse
       await api.post(`/houses/${houseId}/leave`)
       await refreshUser()
-      toast.success('Left house successfully')
-      navigate('/app/dashboard')
+      toast.success('🎉 You have departed the house. Your profile is now set to free agent.')
+      setShowLeaveModal(false)
+      navigate('/house-setup')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to leave house')
     } finally {
@@ -458,8 +481,7 @@ export default function ProfilePage() {
                 variant="danger" 
                 fullWidth 
                 size="sm"
-                loading={leaving}
-                onClick={handleLeaveHouse}
+                onClick={openLeaveHouseModal}
                 className="text-xs !border-accent-rose/30 hover:!bg-accent-rose hover:!text-white"
               >
                 Leave This House
@@ -684,6 +706,105 @@ export default function ProfilePage() {
         </div>
 
       </div>
+
+      {/* Financial Clearance & Leave House Modal */}
+      {showLeaveModal && (
+        <Overlay onClose={() => setShowLeaveModal(false)}>
+          <div className="bento-card bg-obsidian/95 border border-accent-rose/30 shadow-[0_25px_60px_rgba(225,29,72,0.25)] rounded-3xl overflow-hidden relative">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-rose via-red-500 to-accent-orange" />
+            
+            <ModalHeader
+              icon="🚪"
+              title="Exit House Verification"
+              subtitle="Financial & Governance Clearance Check"
+              onClose={() => setShowLeaveModal(false)}
+            />
+
+            <div className="p-6 sm:p-8 space-y-6">
+              {checkingDebts ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-3">
+                  <div className="w-8 h-8 rounded-full border-2 border-accent-rose border-t-transparent animate-spin" />
+                  <p className="text-xs text-primary-muted font-mono">Auditing financial ledger & chore rosters...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Financial Debt Status Strip */}
+                  {debtCheck.totalOwed > 0 ? (
+                    <div className="p-4 rounded-2xl bg-accent-rose/10 border border-accent-rose/30 space-y-2">
+                      <div className="flex items-center gap-2 text-accent-rose font-bold text-sm">
+                        <AlertOctagon size={18} />
+                        <span>Outstanding Debt: ৳{debtCheck.totalOwed.toFixed(2)}</span>
+                      </div>
+                      <p className="text-xs text-primary-muted leading-relaxed">
+                        You cannot leave this house until all shared expense balances are settled with your roommates.
+                      </p>
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowLeaveModal(false)
+                            navigate('/app/finance')
+                          }}
+                          className="px-4 py-2 rounded-xl bg-accent-rose text-white text-xs font-bold shadow-glow flex items-center gap-1.5"
+                        >
+                          <span>Go to Finance & Settle Dues</span>
+                          <ArrowRight size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-accent-emerald/10 border border-accent-emerald/30 flex items-center gap-3">
+                      <CheckCircle2 size={24} className="text-accent-emerald shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-accent-emerald">Zero Outstanding Dues (৳0.00)</div>
+                        <p className="text-[11px] text-primary-muted">You have cleared all shared financial balances in this house.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Checklist Summary */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-white block">Exit Verification Checklist:</span>
+                    <div className="space-y-1.5 text-xs text-primary-muted">
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <span className={debtCheck.totalOwed === 0 ? "text-accent-emerald font-bold" : "text-accent-rose font-bold"}>
+                          {debtCheck.totalOwed === 0 ? "✓" : "✗"}
+                        </span>
+                        <span>Financial balance clearance ({debtCheck.totalOwed === 0 ? "Settled" : `Owes ৳${debtCheck.totalOwed.toFixed(2)}`})</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <span className="text-accent-emerald font-bold">✓</span>
+                        <span>Pending chores reassigned automatically to house admin</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <span className="text-accent-cyan font-bold">ℹ</span>
+                        <span>Profile converts to Free Agent (eligible to join other houses)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <Button variant="secondary" onClick={() => setShowLeaveModal(false)} className="flex-1 py-3 text-xs">
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={handleConfirmLeaveHouse}
+                      loading={leaving}
+                      disabled={debtCheck.totalOwed > 0}
+                      className="flex-[2] py-3 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(225,29,72,0.3)]"
+                    >
+                      Confirm Departure
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </Overlay>
+      )}
+
     </div>
   )
 }
