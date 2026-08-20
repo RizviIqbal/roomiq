@@ -272,11 +272,12 @@ npm run dev
 5. **Financial Reporting & Ledger:** Advanced MongoDB aggregations for historic spending trends and immutable ledgers.
 
 ### Chore & Maintenance Management
-6. **Recurring Chore Assignment & Scheduling:** Custom calendar-based temporal task tracking.
-7. **Algorithmic Chore Rotation:** Round-robin intelligent assignment handling edge cases dynamically.
-8. **Gamified Chore Point System:** Time-sensitive event-driven competitive ranking leaderboard.
-9. **Maintenance Ticketing System:** Multipart data handling for secure photo evidence uploads via Multer.
-10. **Ticket Resolution to Expense Integration:** Complex state machine automatically feeding resolved damages into the finance engine.
+6. **Recurring Chore Assignment & Scheduling:** Custom calendar-based temporal task tracking with deadline monitoring.
+7. **Algorithmic Chore Rotation:** Round-robin intelligent assignment running on Node Cron midnight schedule (`0 0 * * *`) with fairness balance tracking.
+8. **Chore Dispute Resolution System:** Peer-contested verification workflow with quick dispute tags and admin arbitration.
+9. **Gamified Chore Point System & Analytics:** Time-sensitive event-driven ranking leaderboard with on-time delivery percentages.
+10. **Maintenance Ticketing System:** Multipart data handling for secure photo evidence uploads via Multer and urgency triage.
+11. **Maintenance to Expense Conversion:** Automated state machine calculating equal per-roommate splits and feeding resolved repair costs directly into the shared finance ledger.
 
 ### Roommate Matching & Onboarding
 11. **Dynamic Lifestyle Profile Creation:** Highly flexible non-relational document schema for complex user profiles.
