@@ -5,4 +5,5 @@ client/dist/
 .env
 .DS_Store
 UPLOAD_STATUS.md
-
+server/uploads/*
+!server/uploads/.gitkeep
