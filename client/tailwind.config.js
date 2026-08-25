@@ -30,14 +30,19 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', '"DM Sans"', 'sans-serif'],
         body: ['"DM Sans"', 'sans-serif'],
-        display: ['"Satoshi"', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', '"Satoshi"', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
         glass: '0 8px 32px -4px rgba(0, 0, 0, 0.5)',
         bento: 'inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 20px -2px rgba(0,0,0,0.4)',
+        architectural: '0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+      },
+      transitionTimingFunction: {
+        'luxury': 'cubic-bezier(0.17, 0.84, 0.44, 1)',
       },
       keyframes: {
         float: {

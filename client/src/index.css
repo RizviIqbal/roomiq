@@ -1,8 +1,8 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 @layer base {
   * {
@@ -37,35 +37,149 @@
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-orange;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/60;
   }
 
   .font-label-caps {
-    @apply font-mono font-bold tracking-[0.15em] uppercase text-[10px];
+    @apply font-mono font-medium tracking-[0.2em] uppercase text-[11px];
   }
   .font-body-md {
-    @apply font-sans font-medium leading-relaxed;
+    @apply font-sans font-normal leading-relaxed;
   }
   .font-body-lg {
-    @apply font-sans font-medium leading-relaxed text-[16px] md:text-[18px];
+    @apply font-sans font-normal leading-relaxed text-[16px] md:text-[18px];
   }
 
-  /* Backward Compatibility (Fallback) */
-  .neon-glow-primary, .glow-cyan, .glow-violet, .glow-rose, .glow-emerald, .glow-purple, .glow-orange, .text-gradient-violet, .neon-glow-secondary {
-    /* Muted these classes out to clean up the design */
+  /* Kononenko Architectural Underline Link */
+  .arch-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: currentColor;
+    transition: color 0.4s cubic-bezier(0.17, 0.84, 0.44, 1);
   }
-  
+  .arch-link::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.6s cubic-bezier(0.17, 0.84, 0.44, 1);
+  }
+  .arch-link:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .hairline-b {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-t {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-l {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-r {
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-box {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .ln-mask {
+    display: block;
+    overflow: hidden;
+  }
+
+  .cursor-follower {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Rolling Text Hover Effect */
+  .roll-container {
+    display: inline-flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 1.25em;
+    position: relative;
+  }
+  .roll-item {
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.17, 0.84, 0.44, 1);
+  }
+  .group:hover .roll-item-1 {
+    transform: translateY(-100%);
+  }
+  .group:hover .roll-item-2 {
+    transform: translateY(-100%);
+  }
+
+  /* Orbiting Ring Utilities */
+  .orbit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+  }
+
+  .editorial-indent {
+    text-indent: 4.5rem;
+  }
+  @media (max-width: 768px) {
+    .editorial-indent {
+      text-indent: 1.5rem;
+    }
+  }
+
   .animate-marquee {
-      display: flex;
-      width: max-content;
-      animation: marquee 30s linear infinite;
-  }
-  .scan-line {
-      display: none;
+    display: flex;
+    width: max-content;
+    animation: marquee 35s linear infinite;
   }
   .dot-grid {
-      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Top Scroll Progress Bar (Kononenko .yap) */
+  .yap-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #ffffff;
+    transform-origin: left;
+    z-index: 100000;
+    pointer-events: none;
+  }
+
+  /* High-Contrast Inverting Protocol Rows (.lhy) */
+  .invert-row {
+    position: relative;
+    width: 100%;
+    transition: background-color 0.4s cubic-bezier(0.17, 0.84, 0.44, 1), color 0.4s cubic-bezier(0.17, 0.84, 0.44, 1);
+  }
+  .invert-row:hover {
+    background-color: #ffffff;
+    color: #08080a;
+  }
+
+  /* Noise Overlay */
+  .grain-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
   }
 }
 
