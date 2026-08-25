@@ -1,5 +1,30 @@
 const mongoose = require("mongoose");
 
+const reactionSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  emoji: {
+    type: String,
+    required: true
+  }
+}, { _id: false });
+
+const rsvpSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ["going", "maybe", "not_going"],
+    default: "going"
+  }
+}, { _id: false });
+
 const noticeSchema = new mongoose.Schema({
   house: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,7 +57,9 @@ const noticeSchema = new mongoose.Schema({
     type: String,
     enum: ["announcement", "reminder", "event", "warning", "general"],
     default: "general"
-  }
+  },
+  reactions: [reactionSchema],
+  rsvps: [rsvpSchema]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Notice", noticeSchema);
