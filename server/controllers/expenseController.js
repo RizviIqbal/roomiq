@@ -205,6 +205,92 @@ const getBalances = async (req, res) => {
   }
 };
 
+// @desc   Settle all debts between two users in a house
+// @route  POST /api/expenses/house/:houseId/settle-balance
+const settleBalance = async (req, res) => {
+  try {
+    const { houseId } = req.params;
+    const { creditorId, debtorId, amount, paymentMethod = 'bkash', transactionId = '', note = '' } = req.body;
+
+    const actualDebtor = debtorId || req.user._id.toString();
+    const actualCreditor = creditorId;
+
+    if (!actualCreditor) {
+      return res.status(400).json({ message: "Creditor ID is required" });
+    }
+
+    // Find all expenses where actualCreditor was payer and actualDebtor had an unpaid split
+    const expenses = await Expense.find({
+      house: houseId,
+      paidBy: actualCreditor,
+      "splits.user": actualDebtor,
+      "splits.isPaid": false
+    });
+
+    let settledCount = 0;
+    const now = new Date();
+
+    for (const exp of expenses) {
+      let modified = false;
+      for (const split of exp.splits) {
+        if (split.user.toString() === actualDebtor.toString() && !split.isPaid) {
+          split.isPaid = true;
+          split.status = "paid";
+          split.paymentMethod = paymentMethod;
+          split.transactionId = transactionId;
+          split.paidAt = now;
+          modified = true;
+          settledCount++;
+        }
+      }
+      if (modified) {
+        await exp.save();
+      }
+    }
+
+    // Also check if there were offsetting expenses where actualDebtor was payer and actualCreditor had unpaid split
+    const offsettingExpenses = await Expense.find({
+      house: houseId,
+      paidBy: actualDebtor,
+      "splits.user": actualCreditor,
+      "splits.isPaid": false
+    });
+
+    for (const exp of offsettingExpenses) {
+      let modified = false;
+      for (const split of exp.splits) {
+        if (split.user.toString() === actualCreditor.toString() && !split.isPaid) {
+          split.isPaid = true;
+          split.status = "paid";
+          split.paymentMethod = paymentMethod;
+          split.transactionId = transactionId;
+          split.paidAt = now;
+          modified = true;
+          settledCount++;
+        }
+      }
+      if (modified) {
+        await exp.save();
+      }
+    }
+
+    emitToHouse(houseId, "expense_updated", { type: "balance_settled", debtorId: actualDebtor, creditorId: actualCreditor });
+    emitToHouse(houseId, "balance_settled", { debtorId: actualDebtor, creditorId: actualCreditor, amount });
+    
+    logActivity(
+      houseId,
+      req.user._id,
+      "balance_settled",
+      `Settled shared balance`,
+      `Method: ${paymentMethod.toUpperCase()}${transactionId ? ` | TrxID: ${transactionId}` : ''}${note ? ` | Note: ${note}` : ''}`
+    );
+
+    res.json({ message: "Balance successfully settled", settledCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // @desc   Delete an expense (payer or admin only)
 // @route  DELETE /api/expenses/:expenseId
 const deleteExpense = async (req, res) => {
@@ -227,4 +313,4 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-module.exports = { addExpense, getHouseExpenses, submitPayment, approvePayment, requestPayment, getBalances, deleteExpense };
+module.exports = { addExpense, getHouseExpenses, submitPayment, approvePayment, requestPayment, getBalances, deleteExpense, settleBalance };

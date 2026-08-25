@@ -384,7 +384,13 @@ export default function FinancePage() {
 
         {/* Right: Balances & Settle Up (4 cols) */}
         <div className="lg:col-span-4">
-          <BalanceSummary balances={balances} members={house?.members} currency={house?.currency} />
+          <BalanceSummary 
+            balances={balances} 
+            members={house?.members} 
+            currency={house?.currency} 
+            houseId={houseId} 
+            onRefresh={refresh} 
+          />
         </div>
 
       </div>

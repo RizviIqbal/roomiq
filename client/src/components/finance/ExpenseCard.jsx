@@ -268,43 +268,139 @@ export default function ExpenseCard({ expense, currency, onRefresh, members }) {
       {/* Payment Modal */}
       {showPaymentModal && (
         <Overlay onClose={() => setShowPaymentModal(false)}>
-          <div className="w-full max-w-sm glass-panel rounded-3xl p-0 overflow-hidden border border-glass-border shadow-glow">
-            <ModalHeader title={`Settle ${curr}${mySplit.amount}`} onClose={() => setShowPaymentModal(false)} />
-            <div className="px-8 pb-8 pt-4">
-              <form onSubmit={handleSubmitPayment} className="space-y-4">
-                <Select label="Payment Method" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <option value="cash">💵 Cash</option>
-                  <option value="bkash">📱 bKash</option>
-                  <option value="other">📦 Other</option>
-                </Select>
+          <div className="w-full max-w-md bg-obsidian border border-glass-border rounded-3xl p-0 overflow-hidden shadow-2xl animate-fade-up relative font-body text-white">
+            <ModalHeader title={`Settle Split ${curr}${mySplit?.amount}`} onClose={() => setShowPaymentModal(false)} />
+            
+            <div className="p-6 sm:p-8 space-y-6">
+              
+              {/* Payment Summary Card */}
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-glass-border flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar name={expense.paidBy?.name} size={40} src={expense.paidBy?.avatar} />
+                  <div className="min-w-0">
+                    <div className="text-xs text-primary-muted font-mono uppercase">Paying Payer</div>
+                    <div className="text-sm font-bold text-white truncate">{expense.paidBy?.name}</div>
+                    <div className="text-[11px] text-accent-orange truncate">{expense.title}</div>
+                  </div>
+                </div>
 
+                <div className="text-right shrink-0">
+                  <div className="font-mono text-xl font-extrabold text-accent-emerald">
+                    {curr}{mySplit?.amount}
+                  </div>
+                  <span className="text-[9px] font-label-caps uppercase text-accent-emerald/80">
+                    Your Share
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitPayment} className="space-y-5">
+                
+                {/* Payment Channel Pill Selectors - Zero Dropdown Overlap */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-primary-muted pl-1">
+                    Select Payment Method
+                  </label>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'cash', label: '💵 Cash in Hand' },
+                      { id: 'bkash', label: '📱 bKash Wallet' },
+                      { id: 'other', label: '📦 Other / Bank' },
+                    ].map(method => (
+                      <button
+                        key={method.id}
+                        type="button"
+                        onClick={() => setPaymentMethod(method.id)}
+                        className={`p-3 rounded-2xl text-xs font-bold border transition-all text-center ${
+                          paymentMethod === method.id
+                            ? 'bg-accent-emerald/20 border-accent-emerald text-white shadow-glow scale-[1.02]'
+                            : 'bg-white/5 border-glass-border text-primary-muted hover:border-white/20 hover:text-white'
+                        }`}
+                      >
+                        {method.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* bKash Details Card */}
                 {paymentMethod === 'bkash' && (
-                  <div className="space-y-4 animate-fade-up">
-                    {expense.paidBy?.bkashNumber && (
-                      <div className="p-4 rounded-xl bg-[#e2136e]/10 border border-[#e2136e]/30 flex justify-between items-center">
-                        <div>
-                          <div className="font-label-caps text-[10px] text-[#e2136e] mb-1">Send to {expense.paidBy.name}</div>
-                          <div className="font-mono text-white text-[16px]">{expense.paidBy.bkashNumber}</div>
+                  <div className="p-4 rounded-2xl bg-[#e2136e]/10 border border-[#e2136e]/30 space-y-3 animate-fade-up">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-label-caps text-[10px] text-[#e2136e] uppercase tracking-wider font-bold">
+                          {expense.paidBy?.name}'s bKash Number
                         </div>
-                        <button type="button" onClick={() => navigator.clipboard.writeText(expense.paidBy.bkashNumber)} className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20">
-                          <Copy size={16} />
-                        </button>
+                        <div className="font-mono text-base font-bold text-white mt-0.5">
+                          {expense.paidBy?.bkashNumber || 'No wallet number listed'}
+                        </div>
                       </div>
-                    )}
-                    <Input
-                      label="Transaction ID"
-                      placeholder="e.g. 9XF2..."
-                      value={transactionId}
-                      onChange={e => setTransactionId(e.target.value)}
-                    />
+
+                      {expense.paidBy?.bkashNumber && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(expense.paidBy.bkashNumber)
+                              toast.success(`Copied ${expense.paidBy.bkashNumber}!`)
+                            }}
+                            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
+                            title="Copy number"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(expense.paidBy.bkashNumber)
+                              setTimeout(() => { window.location.href = 'bkash://' }, 400)
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-[#e2136e] hover:bg-[#d00f63] text-white text-[11px] font-bold tracking-wide transition-all shadow-sm active:scale-95"
+                          >
+                            Open App
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 pt-1">
+                      <label className="block text-[11px] font-semibold text-primary-muted">
+                        bKash Transaction ID (TrxID) <span className="text-accent-rose">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 9XF892KL"
+                        value={transactionId}
+                        onChange={e => setTransactionId(e.target.value)}
+                        className="w-full bg-black/40 border border-glass-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-accent-emerald font-mono placeholder:text-white/20"
+                      />
+                    </div>
                   </div>
                 )}
                 
-                <div className="pt-4">
-                  <Button type="submit" variant="success" fullWidth loading={submittingPayment} className="shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                    Submit Payment
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPaymentModal(false)}
+                    className="flex-1 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-primary-muted hover:text-white border border-glass-border text-xs font-bold transition-all"
+                  >
+                    Cancel
+                  </button>
+
+                  <Button
+                    type="submit"
+                    variant="success"
+                    loading={submittingPayment}
+                    className="flex-2 py-3.5 rounded-2xl bg-gradient-to-r from-accent-emerald to-teal-500 hover:opacity-95 text-obsidian font-bold text-xs shadow-glow transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <CheckCircle size={15} />
+                    <span>Submit Payment ({curr}{mySplit?.amount})</span>
                   </Button>
                 </div>
+
               </form>
             </div>
           </div>
