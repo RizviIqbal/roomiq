@@ -16,7 +16,8 @@ const server = http.createServer(app);
 initSocket(server);
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+const clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
+app.use(cors({ origin: clientOrigin, credentials: true }));
 app.use(express.json());
 
 // Routes
