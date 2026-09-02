@@ -767,7 +767,18 @@ async function seed() {
         body: "Let's do a house dinner this Friday around 8:30 PM. I'll make chicken biryani, feel free to bring snacks or drinks!",
         postedBy: aisha._id,
         category: "event",
-        isPinned: false
+        isPinned: false,
+        reactions: [
+          { user: rafiq._id, emoji: "🔥" },
+          { user: farhan._id, emoji: "🍕" },
+          { user: zara._id, emoji: "❤️" }
+        ],
+        rsvps: [
+          { user: rafiq._id, status: "going" },
+          { user: farhan._id, status: "going" },
+          { user: zara._id, status: "going" },
+          { user: tanvir._id, status: "maybe" }
+        ]
       },
       {
         house: mainHouse._id,
