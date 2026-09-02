@@ -79,6 +79,7 @@ const markDone = async (req, res) => {
 
     await chore.save();
     emitToHouse(chore.house.toString(), "chore_updated", { type: "done", choreId: chore._id, status: chore.status });
+    logActivity(chore.house.toString(), req.user._id, "chore_done", `Completed chore: ${chore.title}`);
 
     res.json({ message: "Chore marked as done", chore });
   } catch (err) {
@@ -103,6 +104,7 @@ const raiseDispute = async (req, res) => {
     await chore.save();
 
     emitToHouse(chore.house.toString(), "chore_updated", { type: "disputed", choreId: chore._id, status: chore.status });
+    logActivity(chore.house.toString(), req.user._id, "chore_disputed", `Disputed chore: ${chore.title}`, reason || "");
 
     res.json({ message: "Dispute raised", chore });
   } catch (err) {
@@ -125,6 +127,7 @@ const resolveDispute = async (req, res) => {
     await chore.save();
 
     emitToHouse(chore.house.toString(), "chore_updated", { type: "dispute_resolved", choreId: chore._id, status: chore.status });
+    logActivity(chore.house.toString(), req.user._id, "chore_resolved", `Resolved dispute on: ${chore.title}`, `Verdict: ${resolution === "valid" ? "Must redo" : "Upheld as done"}`);
 
     res.json({ message: `Dispute resolved: chore marked as ${chore.status}`, chore });
   } catch (err) {

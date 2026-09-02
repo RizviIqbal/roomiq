@@ -1,5 +1,6 @@
 const Complaint = require("../models/Complaint");
 const { emitToHouse } = require("../socket");
+const logActivity = require("../utils/activityLogger");
 
 // @desc   File a complaint
 // @route  POST /api/complaints
@@ -30,6 +31,13 @@ const fileComplaint = async (req, res) => {
     if (!isAnonymous) await complaint.populate("filedBy", "name avatar");
 
     emitToHouse(houseId, "complaint_updated", { type: "filed", complaint });
+    logActivity(
+      houseId,
+      req.user._id,
+      "complaint_filed",
+      isAnonymous ? "Anonymous feedback submitted" : `Feedback submitted: ${title}`,
+      `Category: ${category}`
+    );
 
     res.status(201).json(complaint);
   } catch (err) {
@@ -110,6 +118,13 @@ const resolveComplaint = async (req, res) => {
 
     await complaint.save();
     emitToHouse(complaint.house.toString(), "complaint_updated", { type: "resolved", complaintId: complaint._id, status: complaint.status });
+    logActivity(
+      complaint.house.toString(),
+      req.user._id,
+      "complaint_resolved",
+      `Feedback ${complaint.status === "dismissed" ? "dismissed" : "resolved"}: ${complaint.title}`,
+      resolution || ""
+    );
 
     res.json({ message: "Complaint resolved", complaint });
   } catch (err) {

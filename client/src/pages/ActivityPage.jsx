@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useSocketEvent } from '../context/SocketContext'
 import { Button, Spinner, EmptyState, Avatar } from '../components/ui'
 import api from '../services/api'
-import { Activity, DollarSign, CheckSquare, Wrench, AlertTriangle, FileText, Users, ArrowDown, Sparkles, TrendingUp, Trophy } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { Activity, DollarSign, CheckSquare, Wrench, AlertTriangle, FileText, Users, ArrowDown, Sparkles, TrendingUp, Trophy, Radio } from 'lucide-react'
 
 // Internal component for progress bars
 const StatBar = ({ icon, label, count, total, color, textClass }) => {
@@ -65,6 +67,33 @@ export default function ActivityPage() {
   useEffect(() => {
     fetchActivities(1, false)
   }, [fetchActivities])
+
+  // Real-time live activity sync
+  useSocketEvent('activity_created', useCallback((newActivity) => {
+    if (!newActivity || !newActivity._id) return
+
+    setActivities(prev => {
+      if (prev.some(a => a._id === newActivity._id)) return prev
+      return [newActivity, ...prev]
+    })
+    setStats(prev => ({ total: (prev.total || 0) + 1 }))
+
+    // Toast notification if another house member created the activity
+    const activityUserId = newActivity.user?._id || newActivity.user
+    const currentUserId = user?._id || user?.id
+    if (activityUserId && currentUserId && activityUserId.toString() !== currentUserId.toString()) {
+      toast.success(newActivity.title, {
+        icon: '⚡',
+        style: {
+          background: '#18181B',
+          color: '#FFFFFF',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '16px',
+          fontSize: '13px'
+        }
+      })
+    }
+  }, [user?._id, user?.id]))
 
   const loadMore = () => {
     const nextPage = page + 1
@@ -172,12 +201,22 @@ export default function ActivityPage() {
   return (
     <div className="w-full px-4 lg:px-8 xl:px-10 pb-24">
       {/* Compact Stats Row */}
-      {stats.total > 0 && (
-        <div className="flex items-center gap-3 mb-6">
-          <span className="font-mono text-[24px] font-bold text-white">{stats.total}</span>
-          <span className="font-label-caps text-primary-muted">Total Activities</span>
+      <div className="flex items-center justify-between mb-6">
+        {stats.total > 0 ? (
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[24px] font-bold text-white">{stats.total}</span>
+            <span className="font-label-caps text-primary-muted">Total Activities</span>
+          </div>
+        ) : <div />}
+
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-emerald/10 border border-accent-emerald/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-emerald opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-emerald"></span>
+          </span>
+          <span className="font-label-caps text-[11px] font-bold tracking-widest text-accent-emerald uppercase">Live Feed</span>
         </div>
-      )}
+      </div>
 
       {loading && !activities.length ? (
         <div className="flex justify-center py-20"><Spinner size={40} color="#06B6D4" /></div>
