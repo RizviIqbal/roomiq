@@ -105,7 +105,7 @@ export const Card = ({ children, className = '', onClick, hover, style }) => (
   </div>
 )
 
-export const Badge = ({ children, color = 'neutral', pulse }) => {
+export const Badge = ({ children, color = 'neutral', pulse, className = '' }) => {
   const colors = {
     neutral:    'border-glass-border text-primary-muted bg-white/5',
     accent:     'border-accent-purple/30 text-accent-purple bg-accent-purple/10 shadow-[0_0_10px_rgba(147,51,234,0.2)]',
@@ -121,6 +121,7 @@ export const Badge = ({ children, color = 'neutral', pulse }) => {
       'font-label-caps text-[10px] font-semibold tracking-[0.15em] whitespace-nowrap',
       colors[color] || colors.neutral,
       pulse ? 'animate-pulse' : '',
+      className,
     ].join(' ')}>
       {pulse && <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />}
       {children}

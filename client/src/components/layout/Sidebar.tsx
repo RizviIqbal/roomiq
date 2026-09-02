@@ -33,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   ]
 
   const exploreNavItems = [
+    { label: 'House Setup',    path: '/house-setup',        icon: Sparkles },
     { label: 'Find Houses',    path: '/app/discover',       icon: Home },
     { label: 'Compatibility',  path: '/app/matching',       icon: Heart },
     { label: 'Find Roommates', path: '/app/find-roommates', icon: Users },

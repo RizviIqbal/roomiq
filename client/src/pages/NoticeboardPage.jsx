@@ -46,7 +46,7 @@ export default function NoticeboardPage() {
   if (!houseId) return (
     <div className="max-w-md mx-auto py-24 px-4 text-center">
       <EmptyState icon="🏠" title="No House Joined" description="JOIN OR CREATE A HOUSE FIRST TO POST NOTICES" />
-      <Button onClick={() => navigate('/setup')} className="mt-4">Set up house</Button>
+      <Button onClick={() => navigate('/house-setup')} className="mt-4">Set up house</Button>
     </div>
   )
 

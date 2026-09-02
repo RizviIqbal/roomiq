@@ -224,9 +224,7 @@ const getPublicHouses = async (req, res) => {
       .lean();
 
     const currentUser = await User.findById(req.user._id);
-    if (!currentUser.compatibilityProfile?.sleepSchedule) {
-      return res.status(400).json({ message: "Complete your compatibility quiz first" });
-    }
+    const hasQuiz = Boolean(currentUser?.compatibilityProfile?.sleepSchedule);
 
     const results = houses.map(house => {
       let totalScore = 0;
@@ -236,7 +234,7 @@ const getPublicHouses = async (req, res) => {
       const populatedMembers = house.members.map(m => {
         let memberScore = null;
         if (m.role === 'admin') adminUser = m.user;
-        if (m.user?.compatibilityProfile?.sleepSchedule) {
+        if (hasQuiz && m.user?.compatibilityProfile?.sleepSchedule) {
           const res = calculateCompatibility(currentUser.compatibilityProfile, m.user.compatibilityProfile);
           memberScore = res.score;
           totalScore += res.score;
@@ -269,7 +267,9 @@ const getPublicHouses = async (req, res) => {
         members: populatedMembers,
         images: house.images || [],
         compatibilityScore: avgScore,
-        compatibilityLabel: avgScore ? (avgScore >= 80 ? "Highly Compatible" : avgScore >= 60 ? "Generally Compatible" : avgScore >= 40 ? "Some Friction" : "High Conflict") : "Not enough data"
+        compatibilityLabel: avgScore 
+          ? (avgScore >= 80 ? "Highly Compatible" : avgScore >= 60 ? "Generally Compatible" : avgScore >= 40 ? "Some Friction" : "High Conflict") 
+          : (hasQuiz ? "Not enough data" : "Complete quiz for score")
       };
     });
 

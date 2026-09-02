@@ -162,7 +162,7 @@ export default function DashboardPage() {
       <div className="text-4xl mb-5">🏠</div>
       <h1 className="text-xl font-bold tracking-tight text-white mb-2">No house connected</h1>
       <p className="text-sm text-primary-muted mb-7">Create a new house profile or join with an invite code.</p>
-      <Button onClick={() => navigate('/setup')} size="lg" className="bg-gradient-to-r from-accent-purple to-accent-orange font-bold text-white shadow-glow">
+      <Button onClick={() => navigate('/house-setup')} size="lg" className="bg-gradient-to-r from-accent-purple to-accent-orange font-bold text-white shadow-glow">
         Set up a house
       </Button>
     </div>

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../services/api'
 import { Menu, User, MessageCircle, Sparkles } from 'lucide-react'
 
 interface TopHeaderProps {
@@ -61,7 +62,46 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onOpenSidebar }) => {
       </div>
 
       {/* Right: Quick Chat & Profile */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
+        
+        {/* Quick Demo Switcher */}
+        <div className="hidden sm:flex items-center gap-1.5 p-1 rounded-2xl bg-white/5 border border-white/10 text-xs">
+          <span className="font-label-caps text-[9px] uppercase tracking-wider text-primary-muted px-2 flex items-center gap-1">
+            <Sparkles size={11} className="text-accent-orange" /> Demo Role
+          </span>
+          {[
+            { label: '👑 Rafiq (Admin)', email: 'rafiq@test.com' },
+            { label: '🧹 Aisha', email: 'aisha@test.com' },
+            { label: '🔍 Kamil (Seeker)', email: 'kamil@test.com' },
+          ].map(p => {
+            const isCurrent = user?.email?.toLowerCase() === p.email.toLowerCase()
+            return (
+              <button
+                key={p.email}
+                type="button"
+                onClick={async () => {
+                  if (isCurrent) return
+                  try {
+                    const { data } = await api.post('/auth/login', { email: p.email, password: 'password123' })
+                    localStorage.setItem('roomiq_token', data.token)
+                    localStorage.setItem('roomiq_user', JSON.stringify(data))
+                    window.location.href = data.currentHouse ? '/app/dashboard' : '/house-setup'
+                  } catch (err) {
+                    console.error(err)
+                  }
+                }}
+                className={`px-2.5 py-1 rounded-xl font-medium transition-all text-[11px] ${
+                  isCurrent
+                    ? 'bg-accent-orange text-obsidian font-bold shadow-glow'
+                    : 'text-primary-muted hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {p.label}
+              </button>
+            )
+          })}
+        </div>
+
         <button
           onClick={() => navigate('/app/messages')}
           title="Direct Messages"

@@ -62,8 +62,9 @@ const AppRoutes = () => {
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
       {/* Onboarding — auth required but no house yet */}
-      <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
+      <Route path="/quiz"        element={<PrivateRoute><QuizPage /></PrivateRoute>} />
       <Route path="/house-setup" element={<PrivateRoute><HouseSetupPage /></PrivateRoute>} />
+      <Route path="/setup"       element={<Navigate to="/house-setup" replace />} />
       
       {/* App shell with sidebar */}
       <Route path="/app" element={<PrivateRoute><AppShell /></PrivateRoute>}>

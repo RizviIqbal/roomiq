@@ -366,9 +366,18 @@ export default function ExpenseCard({ expense, currency, onRefresh, members }) {
                     </div>
 
                     <div className="space-y-1.5 pt-1">
-                      <label className="block text-[11px] font-semibold text-primary-muted">
-                        bKash Transaction ID (TrxID) <span className="text-accent-rose">*</span>
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-semibold text-primary-muted">
+                          bKash Transaction ID (TrxID) <span className="text-accent-rose">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setTransactionId(`BK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`)}
+                          className="text-[10px] text-accent-emerald hover:underline font-mono"
+                        >
+                          ⚡ Auto-Fill Demo TrxID
+                        </button>
+                      </div>
                       <input
                         type="text"
                         placeholder="e.g. 9XF892KL"

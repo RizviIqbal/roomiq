@@ -174,12 +174,21 @@ export default function SettleBalanceModal({
                 </div>
 
                 <div className="space-y-1.5 pt-1">
-                  <label className="block text-[11px] font-semibold text-primary-muted">
-                    Transaction ID (TrxID)
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[11px] font-semibold text-primary-muted">
+                      Transaction ID (TrxID)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setTransactionId(`BK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`)}
+                      className="text-[10px] text-accent-emerald hover:underline font-mono"
+                    >
+                      ⚡ Auto-Fill Demo TrxID
+                    </button>
+                  </div>
                   <input
                     type="text"
-                    placeholder="e.g. 9XF892KL (Optional)"
+                    placeholder="e.g. 9XF892KL"
                     value={transactionId}
                     onChange={e => setTransactionId(e.target.value)}
                     className="w-full bg-black/40 border border-glass-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-accent-emerald font-mono placeholder:text-white/20"

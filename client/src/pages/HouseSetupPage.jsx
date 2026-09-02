@@ -23,13 +23,7 @@ export default function HouseSetupPage() {
   const { user, refreshUser } = useAuth()
   const navigate = useNavigate()
 
-  // Redirect if no compatibility profile
-  useEffect(() => {
-    if (user && !user.compatibilityProfile?.sleepSchedule) {
-      toast('Please complete the compatibility quiz first.', { icon: '🧠' })
-      navigate('/quiz')
-    }
-  }, [user, navigate])
+  const hasQuiz = Boolean(user?.compatibilityProfile?.sleepSchedule)
 
   const [mode, setMode]       = useState(null) // 'create' | 'join'
   const [loading, setLoading] = useState(false)
@@ -176,9 +170,21 @@ export default function HouseSetupPage() {
         
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-orange/10 border border-accent-orange/20 text-accent-orange font-label-caps text-[10px] uppercase tracking-wider">
-            <Sparkles size={12} className="animate-pulse" /> Step 2: Living Space Onboarding
-          </div>
+          {user?.currentHouse ? (
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs">
+              <span className="text-primary-muted">Connected House: <strong className="text-white">{user.currentHouse.name || 'Active House'}</strong></span>
+              <button
+                onClick={() => navigate('/app/dashboard')}
+                className="text-accent-orange hover:underline font-bold"
+              >
+                Go to Dashboard →
+              </button>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-orange/10 border border-accent-orange/20 text-accent-orange font-label-caps text-[10px] uppercase tracking-wider">
+              <Sparkles size={12} className="animate-pulse" /> Step 2: Living Space Onboarding
+            </div>
+          )}
 
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
             How would you like to <span className="text-gradient">begin?</span>
@@ -519,6 +525,27 @@ export default function HouseSetupPage() {
               <Badge color="accent" className="font-mono text-xs">{publicHouses.length} Available</Badge>
             </div>
 
+            {!hasQuiz && (
+              <div className="bento-card rounded-2xl p-4 border border-accent-orange/30 bg-accent-orange/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-accent-orange/20 text-accent-orange flex items-center justify-center shrink-0">
+                    <Sparkles size={16} />
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-white">Unlock Lifestyle Synergy Scores</h5>
+                    <p className="text-[11px] text-primary-muted">Take our 2-minute lifestyle quiz to calculate personalized compatibility with these flats.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/quiz')}
+                  className="px-3.5 py-1.5 rounded-xl bg-accent-orange hover:bg-accent-orange/90 text-obsidian font-bold text-xs shadow-glow transition-all shrink-0"
+                >
+                  Take Quiz →
+                </button>
+              </div>
+            )}
+
             {loadingHouses ? (
               <div className="flex justify-center py-20">
                 <Spinner size={36} color="#00E5FF" />
@@ -534,7 +561,6 @@ export default function HouseSetupPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {publicHouses.map((house) => {
-                  const score = house.compatibilityScore || 90
                   return (
                     <div
                       key={house._id}
@@ -555,9 +581,15 @@ export default function HouseSetupPage() {
                             </p>
                           </div>
 
-                          <span className="px-2.5 py-1 rounded-full bg-accent-rose/10 border border-accent-rose/20 text-accent-rose font-mono text-xs font-bold flex items-center gap-1 shrink-0">
-                            <Heart size={12} className="fill-accent-rose" /> {score}%
-                          </span>
+                          {house.compatibilityScore != null ? (
+                            <span className="px-2.5 py-1 rounded-full bg-accent-rose/10 border border-accent-rose/20 text-accent-rose font-mono text-xs font-bold flex items-center gap-1 shrink-0">
+                              <Heart size={12} className="fill-accent-rose" /> {house.compatibilityScore}%
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-primary-muted font-mono text-[11px] font-medium flex items-center gap-1 shrink-0">
+                              Public
+                            </span>
+                          )}
                         </div>
 
                         {/* Metric Chips */}
@@ -648,7 +680,7 @@ export default function HouseSetupPage() {
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-accent-purple/10 to-accent-orange/10 border border-white/5 flex items-center gap-3.5">
                   <div className="text-3xl">🏡</div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Spacious Apartment in {selectedHouse.address.split(',')[0]}</h4>
+                    <h4 className="text-sm font-bold text-white">Spacious Apartment in {selectedHouse.address ? selectedHouse.address.split(',')[0] : 'Dhaka'}</h4>
                     <p className="text-xs text-primary-muted">{selectedHouse.totalRooms || 3} Bedroom Flat with communal amenities</p>
                   </div>
                 </div>
@@ -681,7 +713,7 @@ export default function HouseSetupPage() {
                   <span className="text-[10px] font-label-caps uppercase text-primary-muted block">Synergy Match</span>
                   <span className="text-sm font-bold text-accent-rose font-mono flex items-center justify-center gap-1">
                     <Heart size={12} className="fill-accent-rose text-accent-rose" />
-                    {selectedHouse.compatibilityScore || 90}%
+                    {selectedHouse.compatibilityScore != null ? `${selectedHouse.compatibilityScore}%` : 'N/A'}
                   </span>
                 </div>
               </div>

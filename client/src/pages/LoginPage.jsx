@@ -109,7 +109,7 @@ export default function LoginPage() {
       if (user.currentHouse) {
         navigate('/dashboard')
       } else {
-        navigate('/setup')
+        navigate('/house-setup')
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Invalid email or password. Please try again.')
