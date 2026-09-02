@@ -133,11 +133,14 @@ cp .env.example .env
 ### 3. Seed the database
 
 ```bash
-cd server
-node massive-seed.js
+# From root
+npm run seed
+
+# Or inside server directory
+cd server && npm run seed
 ```
 
-This creates 5 test users in a fully populated main house, plus 15 free agents and 9 other generated houses.
+This populates MongoDB with the complete 20-feature dataset: 5 resident members in the main house (Mirpur Nest), 4 prospective roommates / free agents, 4 public house listings, shared expenses, chores with dispute resolution, maintenance reports, house rules, notices with RSVPs, complaints, activity feed, and messages.
 
 ### 4. Run the project
 
@@ -153,15 +156,16 @@ npm run dev
 
 ## Test Accounts (after seeding)
 
-| Name   | Email             | Role   | Password     |
-|--------|-------------------|--------|--------------|
-| Rafiq  | rafiq@test.com    | Admin  | password123  |
-| Aisha  | aisha@test.com    | Member | password123  |
-| Farhan | farhan@test.com   | Member | password123  |
-| Zara   | zara@test.com     | Member | password123  |
-| Kamil  | kamil@test.com    | Member | password123  |
+| Name   | Email             | Role / Status                 | Password     |
+|--------|-------------------|-------------------------------|--------------|
+| Rafiq  | rafiq@test.com    | House Admin (Mirpur Nest)     | password123  |
+| Aisha  | aisha@test.com    | Member (Mirpur Nest)          | password123  |
+| Farhan | farhan@test.com   | Member (Mirpur Nest)          | password123  |
+| Zara   | zara@test.com     | Member (Mirpur Nest)          | password123  |
+| Tanvir | tanvir@test.com   | Member (Mirpur Nest)          | password123  |
+| Kamil  | kamil@test.com    | Free Agent (Match Candidate)  | password123  |
 
-**House Invite Code:** `RAFIQ123`
+**House Invite Code:** `NEST24`
 
 ---
 
