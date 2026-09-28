@@ -390,7 +390,33 @@ export default function LoginPage() {
               )}
             </button>
 
+            {/* Platform Highlights */}
+            <div className="pt-5 border-t border-glass-border space-y-3">
+              <span className="font-label-caps text-[10px] text-primary-muted uppercase tracking-wider font-bold flex items-center gap-1.5 px-1">
+                <Sparkles className="w-3.5 h-3.5 text-accent-orange" />
+                Why Households Love RoomiQ
+              </span>
 
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { icon: CreditCard, label: 'Auto Split Expenses', desc: 'Zero arguments', color: 'text-accent-emerald' },
+                  { icon: Clock, label: 'Smart Chore Rotation', desc: 'Fair & automated', color: 'text-accent-purple' },
+                  { icon: Users, label: 'Roommate Matching', desc: '8-trait algorithm', color: 'text-accent-orange' },
+                ].map((feat, i) => (
+                  <motion.div
+                    key={feat.label}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="p-3.5 rounded-2xl bg-white/[0.03] border border-glass-border text-center space-y-2 hover:bg-white/[0.06] hover:border-white/10 transition-all group"
+                  >
+                    <feat.icon className={`w-5 h-5 mx-auto ${feat.color} group-hover:scale-110 transition-transform`} />
+                    <div className="text-xs font-bold text-white">{feat.label}</div>
+                    <div className="text-[10px] text-primary-muted">{feat.desc}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
           </div>
 
