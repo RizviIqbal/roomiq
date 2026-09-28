@@ -4,7 +4,7 @@ let socket = null
 
 export const getSocket = () => {
   if (!socket) {
-    socket = io('/', {
+    socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || '/', {
       autoConnect: false,
       transports: ['websocket', 'polling'],
     })
