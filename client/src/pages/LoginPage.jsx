@@ -69,7 +69,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [showPw, setShowPw] = useState(false)
-  const [selectedDemoEmail, setSelectedDemoEmail] = useState(null)
+
 
   const set = (k) => (e) => {
     setForm(f => ({ ...f, [k]: e.target.value }))
@@ -116,15 +116,10 @@ export default function LoginPage() {
       setErrors({ auth: 'Authentication failed. Please verify your email and password.' })
     } finally {
       setLoading(false)
-      setSelectedDemoEmail(null)
     }
   }
 
-  const handleQuickDemoLogin = (email) => {
-    setSelectedDemoEmail(email)
-    setForm({ email, password: 'password123' })
-    handleLoginSubmit(email, 'password123')
-  }
+
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -298,7 +293,7 @@ export default function LoginPage() {
               Sign In to Your Household
             </h2>
             <p className="text-sm text-primary-muted">
-              Enter your verified credentials or select a demo profile below for instant access.
+              Enter your credentials to access your household dashboard.
             </p>
           </div>
 
@@ -395,52 +390,7 @@ export default function LoginPage() {
               )}
             </button>
 
-            {/* 1-CLICK FAST-PASS DEMO PROFILES */}
-            <div className="pt-5 border-t border-glass-border space-y-3">
-              <div className="flex justify-between items-center px-1">
-                <span className="font-label-caps text-[10px] text-primary-muted uppercase tracking-wider font-bold flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-accent-orange" />
-                  1-Click Demo Profiles
-                </span>
-                <span className="text-[10px] text-primary-muted font-mono">pw: password123</span>
-              </div>
 
-              {/* 2x2 Demo Profile Grid - Cleanly Formatted with Zero Overflow */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {DEMO_ACCOUNTS.map((acc) => {
-                  const isSelected = selectedDemoEmail === acc.email && loading
-                  return (
-                    <button
-                      key={acc.email}
-                      onClick={() => handleQuickDemoLogin(acc.email)}
-                      disabled={loading}
-                      className={`p-3.5 rounded-2xl bg-white/5 border text-left transition-all group flex items-center justify-between gap-2 overflow-hidden hover:bg-white/10 hover:border-accent-orange/40 hover:shadow-glow ${
-                        isSelected ? 'border-accent-orange bg-white/10' : 'border-glass-border'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <img 
-                          src={acc.avatar} 
-                          alt={acc.name} 
-                          className="w-9 h-9 rounded-xl object-cover border border-white/20 shadow-sm shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-bold text-white group-hover:text-accent-orange transition-colors truncate">
-                            {acc.name}
-                          </div>
-                          <div className="text-[10px] text-primary-muted truncate">
-                            {acc.role}
-                          </div>
-                        </div>
-                      </div>
-                      <span className={`text-[9px] font-label-caps uppercase px-2 py-0.5 rounded-full border bg-gradient-to-r ${acc.color} shrink-0 whitespace-nowrap`}>
-                        {acc.badge}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
 
           </div>
 
