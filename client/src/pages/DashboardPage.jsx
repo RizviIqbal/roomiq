@@ -221,7 +221,7 @@ export default function DashboardPage() {
 
               <div className="font-mono text-xs text-primary-muted flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-accent-emerald animate-ping" />
-                <span>REAL-TIME SOCKET SYNC</span>
+                <span>LIVE CLOUD SYNC</span>
               </div>
             </div>
 

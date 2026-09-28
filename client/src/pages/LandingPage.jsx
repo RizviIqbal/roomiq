@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useSpring, useMotionValue } from 'framer-motion'
 import Lenis from 'lenis'
@@ -617,11 +617,11 @@ export default function LandingPage() {
               
               <button
                 onClick={() => navigate('/login')}
-                data-cursor="DEMO"
+                data-cursor="SIGN IN"
                 className="px-8 py-4 bg-white/10 border border-white/20 hover:bg-white/20 font-mono text-xs tracking-wider uppercase text-white font-semibold transition-colors flex items-center gap-3"
               >
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Explore Live Demo House</span>
+                <span>Sign In to Dashboard</span>
               </button>
             </div>
           </div>
@@ -1467,10 +1467,10 @@ export default function LandingPage() {
 
             <button
               onClick={() => navigate('/login')}
-              data-cursor="DEMO"
+              data-cursor="SIGN IN"
               className="w-full sm:w-auto px-10 py-5 bg-white/10 border border-white/20 hover:bg-white/20 font-mono text-xs tracking-wider uppercase text-white font-semibold transition-colors"
             >
-              Explore Live House Demo
+              Sign In to Existing House
             </button>
           </div>
         </div>

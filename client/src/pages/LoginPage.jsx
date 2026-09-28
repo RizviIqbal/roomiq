@@ -21,44 +21,12 @@ import {
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 
-// Fast-pass seeded demo accounts for instant showcase
-const DEMO_ACCOUNTS = [
-  { 
-    name: 'Rafiq Ahmed', 
-    role: 'House Admin', 
-    email: 'rafiq@test.com', 
-    house: 'Mirpur Nest',
-    badge: '👑 Admin',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30 text-amber-300'
-  },
-  { 
-    name: 'Aisha Rahman', 
-    role: 'Chore Lead', 
-    email: 'aisha@test.com', 
-    house: 'Mirpur Nest',
-    badge: '🧹 Chores',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-300'
-  },
-  { 
-    name: 'Farhan Kabir', 
-    role: 'Expense Lead', 
-    email: 'farhan@test.com', 
-    house: 'Mirpur Nest',
-    badge: '💰 Ledger',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30 text-blue-300'
-  },
-  { 
-    name: 'Kamil Hossain', 
-    role: 'Free Agent', 
-    email: 'kamil@test.com', 
-    house: 'Dhaka House',
-    badge: '🔍 Seeker',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    color: 'from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-300'
-  }
+// Curated resident showcase avatars
+const SHOWCASE_AVATARS = [
+  { name: 'Resident 1', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Resident 2', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Resident 3', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Resident 4', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' }
 ]
 
 export default function LoginPage() {
@@ -179,9 +147,9 @@ export default function LoginPage() {
                   ACTIVE HOUSEHOLD SYNC
                 </span>
                 <h3 className="font-display text-xl xl:text-2xl font-bold text-white mt-1">
-                  The Mirpur Nest Residence #4B
+                  Oakwood Co-Living Residence
                 </h3>
-                <p className="text-xs text-primary-muted mt-0.5">Dhaka, Bangladesh • 4 Verified Residents</p>
+                <p className="text-xs text-primary-muted mt-0.5">Verified Household • 4 Active Residents</p>
               </div>
               <span className="px-3 py-1 rounded-full bg-accent-emerald/15 border border-accent-emerald/30 text-xs font-mono text-accent-emerald font-bold">
                 100% Equilibrium
@@ -221,7 +189,7 @@ export default function LoginPage() {
               </div>
               <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                 <div className="flex items-center -space-x-2">
-                  {DEMO_ACCOUNTS.map((acc, idx) => (
+                  {SHOWCASE_AVATARS.map((acc, idx) => (
                     <img
                       key={idx}
                       src={acc.avatar}
@@ -261,7 +229,7 @@ export default function LoginPage() {
       </div>
 
       {/* ========================================================= */}
-      {/* RIGHT COLUMN: AUTHENTICATION FORM & DEMO LAUNCHER (7 cols) */}
+      {/* RIGHT COLUMN: AUTHENTICATION FORM (7 cols)                 */}
       {/* ========================================================= */}
       <div className="w-full lg:w-7/12 xl:w-7/12 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 relative z-10 overflow-y-auto min-h-screen">
         

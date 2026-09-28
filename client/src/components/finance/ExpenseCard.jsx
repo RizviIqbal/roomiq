@@ -372,10 +372,17 @@ export default function ExpenseCard({ expense, currency, onRefresh, members }) {
                         </label>
                         <button
                           type="button"
-                          onClick={() => setTransactionId(`BK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`)}
+                          onClick={async () => {
+                            try {
+                              const text = await navigator.clipboard.readText()
+                              if (text) setTransactionId(text.trim())
+                            } catch {
+                              // clipboard unavailable
+                            }
+                          }}
                           className="text-[10px] text-accent-emerald hover:underline font-mono"
                         >
-                          ⚡ Auto-Fill Demo TrxID
+                          📋 Paste TrxID
                         </button>
                       </div>
                       <input

@@ -10,6 +10,10 @@ const addExpense = async (req, res) => {
   try {
     const { houseId, title, totalAmount, category, splitType, splits, isRecurring, recurringDay, note, date } = req.body;
 
+    if (!title) {
+      return res.status(400).json({ message: "Expense title is required" });
+    }
+
     const house = await House.findById(houseId);
     if (!house) return res.status(404).json({ message: "House not found" });
 
